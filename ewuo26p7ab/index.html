@@ -398,6 +398,63 @@
   }
 
   /* ===== 列印／存成 PDF ===== */
+  /* ---- 點選式輸入 ---- */
+  .vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #expFormCard .grid > div:has(#expCat) { grid-column: 1 / -1; order: -3; }
+  #expFormCard .grid > div:has(#expItem), #expFormCard .grid > div:has(#expAmount) { order: -2; }
+  #expFormCard .grid > div:has(#expDate), #expFormCard .grid > div:has(#expCurrency), #expFormCard .grid > div:has(#expPay) { grid-column: 1 / -1; }
+  #expFormCard .grid > div:has(#expDate) { order: -1; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; background: var(--paper); color: var(--cocoa); border: 1px solid var(--milktea); font-size: .95rem; font-weight: 500; }
+  .chip:hover { background: var(--oat); }
+  .chip.on { background: var(--caramel-btn); color: #fff; border-color: var(--caramel-btn); }
+  .chip .ic-c { width: 20px; height: 20px; }
+  .chips.cats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .chips.cats .chip { flex-direction: column; justify-content: center; gap: 3px; min-height: 64px; padding: 6px 2px; border-radius: 14px; font-size: .78rem; line-height: 1.2; text-align: center; }
+  .chips.cats .chip .ic-c { width: 24px; height: 24px; }
+  @media (max-width: 360px) { .chips.cats { grid-template-columns: repeat(4, 1fr); } }
+  .chip.more { border-style: dashed; color: var(--muted); }
+  .daterow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .daterow input[type=date] { width: auto; flex: 1 1 150px; min-height: 44px; }
+  .ic-c { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; width: 18px; height: 18px; flex-shrink: 0; vertical-align: -4px; }
+  .tag .ic-c { width: 15px; height: 15px; margin-right: 3px; vertical-align: -3px; }
+  /* 分帳：頭像 */
+  .av { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; font-size: .9rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .av .ic-c { width: 18px; height: 18px; }
+  .av.k0 { background: #C98B8E; } .av.k1 { background: #8FA0B8; } .av.k2 { background: #A9B09A; } .av.k3 { background: #C9A27A; } .av.k4 { background: #A58FB8; } .av.k5 { background: #8DB0AA; } .av.kp { background: var(--caramel); }
+  .payers { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .payers .chip { padding: 0 14px 0 5px; }
+  .payers .chip.on { background: var(--oat); color: var(--cocoa); border: 2px solid var(--caramel-btn); font-weight: 700; }
+  #expSplit { gap: 8px; }
+  #expSplit label { border: 1px solid var(--milktea); border-radius: 999px; padding: 4px 8px 4px 5px; background: var(--paper); min-height: 44px; position: relative; }
+  #expSplit label:has(input[type=checkbox]:checked) { background: var(--oat); border: 2px solid var(--caramel-btn); font-weight: 700; }
+  #expSplit label:has(input[type=checkbox]:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+  #expSplit input[type=checkbox] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  #expSplit label:not(:has(input[type=checkbox]:checked)) .stp { display: none; }
+  .stp { display: inline-flex; align-items: center; gap: 2px; margin-left: 4px; font-weight: 400; }
+  .stp button { min-height: 30px; width: 30px; padding: 0; border-radius: 50%; background: var(--paper); color: var(--cocoa); border: 1px solid var(--milktea); font-size: 1rem; }
+  .stp .w { width: 46px !important; text-align: center; min-height: 30px !important; padding: 2px !important; }
+  .spq { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
+  .spq button { min-height: 34px; padding: 0 12px; font-size: .85rem; background: var(--paper); color: var(--cocoa); border: 1px solid var(--milktea); }
+  .mvrow { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .mvrow .arr { color: var(--muted); }
+  /* 更多欄位：勾選改成點選標籤 */
+  #expFormCard .checkline { display: inline-flex; border: 1px solid var(--milktea); border-radius: 999px; padding: 0 16px; min-height: 44px; background: var(--paper); position: relative; }
+  #expFormCard .checkline:has(input:checked) { background: var(--caramel-btn); color: #fff; border-color: var(--caramel-btn); font-weight: 600; }
+  #expFormCard .checkline:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+  #expFormCard .checkline input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+
+.howto{margin:8px 0 6px}
+.howto h5{margin:12px 0 6px;font-size:14px;color:var(--caramel);letter-spacing:.04em}
+.hsteps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.hsteps.two{grid-template-columns:repeat(2,1fr);max-width:50%}
+@media(max-width:520px){.hsteps{grid-template-columns:repeat(2,1fr)}.hsteps.two{max-width:none}}
+.hsteps figure{margin:0;text-align:center}
+.hsteps svg{width:100%;max-width:120px;height:auto;display:block;margin:0 auto}
+.hsteps figcaption{font-size:12.5px;line-height:1.5;color:var(--muted);margin-top:4px}
+.hsteps figcaption b{display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--caramel);color:#fff;font-size:11px;line-height:18px;margin-right:3px}
+.howto .hnote{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+
   /* 提醒橫幅 */
   .banner { border-left: 5px solid var(--caramel); }
   .banner.warnb { border-left-color: var(--brick); background: #FFF4F5; }
@@ -446,6 +503,7 @@
       <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="2" seed="3" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="1.1" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
+    <symbol id="c0" viewBox="0 0 24 24"><path d="M21 4 3 11l7 3 3 7z"/><path d="M10 14 21 4"/></symbol><symbol id="c1" viewBox="0 0 24 24"><path d="M5 16v-4l2-5h10l2 5v4z"/><path d="M5 12h14"/><circle cx="8" cy="17.5" r="1.6"/><circle cx="16" cy="17.5" r="1.6"/></symbol><symbol id="c2" viewBox="0 0 24 24"><path d="M3 19V7"/><path d="M3 15h18v4"/><path d="M21 15v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="12" r="1.8"/></symbol><symbol id="c3" viewBox="0 0 24 24"><rect x="6" y="3.5" width="12" height="13" rx="3"/><path d="M6 10.5h12"/><circle cx="9" cy="13.5" r=".6"/><circle cx="15" cy="13.5" r=".6"/><path d="M8.5 20.5l2-4M15.5 20.5l-2-4"/></symbol><symbol id="c4" viewBox="0 0 24 24"><path d="M8 3 5 21M16 3l3 18"/><path d="M12 5v2M12 11v2M12 17v2"/></symbol><symbol id="c5" viewBox="0 0 24 24"><rect x="4" y="4" width="10" height="16" rx="1.5"/><path d="M4 10h10"/><path d="M14 8h2l2 2v7a1.5 1.5 0 0 0 3 0V9l-3-3"/></symbol><symbol id="c6" viewBox="0 0 24 24"><path d="M4 12h16a8 8 0 0 1-16 0z"/><path d="M14 3l4 7M17 3l2 6"/><path d="M8 20h8"/></symbol><symbol id="c7" viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol><symbol id="c8" viewBox="0 0 24 24"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10" stroke-dasharray="1.5 2"/></symbol><symbol id="c9" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="8.5" cy="12" r=".7"/><circle cx="12" cy="12" r=".7"/><circle cx="15.5" cy="12" r=".7"/></symbol><symbol id="p0" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2.4"/><path d="M6 10v4M18 10v4"/></symbol><symbol id="p1" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/></symbol><symbol id="p2" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/></symbol><symbol id="p3" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/></symbol><symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M5 7l9-3.5 2 3.5"/><rect x="14" y="11.5" width="7" height="5" rx="2.5"/></symbol><symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/></symbol>
     <symbol id="i-overview" viewBox="0 0 24 24">
       <g filter="url(#pencil)">
         <path d="M3.5 3.4 L3.3 20.8 M3.2 20.6 L20.9 20.3"/>
@@ -656,12 +714,13 @@
       <p class="hint" style="margin:0 0 12px"><svg class="ic-s" aria-hidden="true"><use href="#i-bulb"/></svg>不用把每筆花費拆得很細，先選擇最接近的類別，掌握各項預算與實際支出的差距就好。</p>
       <div class="grid">
         <div>
-          <label for="expDate">日期</label>
-          <input id="expDate" type="date">
+          <label for="expDate" id="lbDate">日期</label>
+          <div class="daterow"><div class="chips" id="dateChips" role="group" aria-labelledby="lbDate"></div><input id="expDate" type="date"></div>
         </div>
         <div>
-          <label for="expCat">類別</label>
-          <select id="expCat"></select>
+          <label id="lbCat">類別</label>
+          <div class="chips cats" id="catChips" role="group" aria-labelledby="lbCat"></div>
+          <select id="expCat" class="vh" tabindex="-1" aria-hidden="true"></select>
         </div>
         <div>
           <label for="expItem">花費項目</label>
@@ -669,12 +728,14 @@
           <datalist id="itemList"></datalist>
         </div>
         <div>
-          <label for="expCurrency">幣別</label>
-          <select id="expCurrency"></select>
+          <label id="lbCur">幣別</label>
+          <div class="chips" id="curChips" role="group" aria-labelledby="lbCur"></div>
+          <select id="expCurrency" class="vh" aria-labelledby="lbCur" style="margin-top:8px"></select>
         </div>
         <div>
-          <label for="expPay">付款方式</label>
-          <select id="expPay"></select>
+          <label id="lbPay">付款方式</label>
+          <div class="chips" id="payChips" role="group" aria-labelledby="lbPay"></div>
+          <select id="expPay" class="vh" tabindex="-1" aria-hidden="true"></select>
         </div>
         <div>
           <label for="expAmount" id="expAmountLabel">金額（新台幣）</label>
@@ -691,13 +752,15 @@
 
       <div id="splitBlock" style="display:none">
         <div class="field" style="margin-top:14px; max-width:260px">
-          <label for="expPayer">付款人</label>
-          <select id="expPayer"></select>
+          <label id="lbPayer">誰付的錢？</label>
+          <div class="payers" id="payerChips" role="group" aria-labelledby="lbPayer"></div>
+          <select id="expPayer" class="vh" tabindex="-1" aria-hidden="true"></select>
         </div>
         <div>
-          <label>分攤的人與份數</label>
+          <label>誰要分攤？</label>
+          <div class="spq"><button type="button" data-sq="all">全部人</button><button type="button" data-sq="payer">只有付錢的人</button><button type="button" data-sq="reset">份數都改回 1</button></div>
           <div class="checks" id="expSplit"></div>
-          <p class="hint" style="margin-top:0">勾選要分攤的人；預設平均分攤，要按比例就調整份數（例如 2 和 1，或有人只吃一半填 0.5）。</p>
+          <p class="hint" style="margin-top:0">點名字選要分攤的人，預設平均分攤；要按比例就用 − ＋ 調整份數（例如有人吃兩份按到 2，只吃一半按到 0.5）。</p>
         </div>
       </div>
 
@@ -718,8 +781,9 @@
             <input id="expPlace" type="text" placeholder="例如：弘大">
           </div>
           <div>
-            <label for="expNeed">必要性</label>
-            <select id="expNeed">
+            <label id="lbNeed">必要性</label>
+            <div class="chips" id="needChips" role="group" aria-labelledby="lbNeed"></div>
+            <select id="expNeed" class="vh" tabindex="-1" aria-hidden="true">
               <option value="">不標記</option>
               <option value="必要">必要支出</option>
               <option value="非必要">非必要支出</option>
@@ -1131,9 +1195,10 @@
       <div id="homeOff">
         <p class="hint" style="margin:0 0 6px">加入後會出現在手機桌面，點一下就能打開；打開過一次之後，<b>沒有網路也能記帳</b>（查匯率需要網路）。</p>
         <ul class="homesteps">
-          <li><b>iPhone</b>：用 Safari 打開這一頁 → 點下方的「分享」（方框加向上箭頭）→「加入主畫面」</li>
+          <li><b>iPhone</b>：用 Safari 打開這一頁 → 點「分享」（方框加向上箭頭；新版 iPhone 在右下角「⋯」裡面）→「加入主畫面」→「新增」</li>
           <li><b>Android</b>：用 Chrome 打開 → 右上角 ⋮ →「加到主畫面」或「安裝應用程式」</li>
         </ul>
+<div class="howto"><h5>iPhone（Safari）</h5><div class="hsteps"><figure><svg viewBox="0 0 120 200" role="img" aria-label="iPhone 步驟一：點下方的分享按鈕，新版 iPhone 在右下角的三個點裡面"><rect x="4" y="4" width="112" height="192" rx="18" fill="#FFFFFF" stroke="#E6C5C1" stroke-width="2"/><rect x="44" y="10" width="32" height="5" rx="2.5" fill="#EEEAEC"/><rect x="16" y="28" width="70" height="6" rx="3" fill="#EEEAEC"/><rect x="16" y="42" width="88" height="6" rx="3" fill="#EEEAEC"/><rect x="16" y="56" width="60" height="6" rx="3" fill="#EEEAEC"/><rect x="16" y="78" width="88" height="6" rx="3" fill="#EEEAEC"/><rect x="16" y="92" width="74" height="6" rx="3" fill="#EEEAEC"/><rect x="16" y="106" width="50" height="6" rx="3" fill="#EEEAEC"/><rect x="10" y="164" width="100" height="24" rx="12" fill="#EEEAEC"/><text x="60" y="180" text-anchor="middle" font-size="8" fill="#5B4A4F" font-family="sans-serif">網址</text><g transform="translate(24 177)" fill="none" stroke="#5B4A4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M-5 -1 v8 h10 v-8"/><path d="M0 3 v-11 M-3.5 -5 L0 -8.5 L3.5 -5"/></g><circle cx="92" cy="176" r="1.7" fill="#5B4A4F"/><circle cx="97" cy="176" r="1.7" fill="#5B4A4F"/><circle cx="102" cy="176" r="1.7" fill="#5B4A4F"/><circle cx="97" cy="176" r="11" fill="none" stroke="#E28896" stroke-width="2.6"/><circle cx="24" cy="176" r="11" fill="none" stroke="#E28896" stroke-width="2.6"/><g transform="translate(100 182)"><path d="M0 0 l9 22 l3 -8 l8 -2z" fill="#5B4A4F"/></g></svg><figcaption><b>1</b>點「分享」<br>新版在右下角「⋯」裡</figcaption></figure><figure><svg viewBox="0 0 120 200" role="img" aria-label="iPhone 步驟二：在選單裡找到「加入主畫面」"><rect x="4" y="4" width="112" height="192" rx="18" fill="#FFFFFF" stroke="#E6C5C1" stroke-width="2"/><rect x="44" y="10" width="32" height="5" rx="2.5" fill="#EEEAEC"/><rect x="4" y="70" width="112" height="126" rx="16" fill="#F7F3F4"/><rect x="50" y="76" width="20" height="3" rx="1.5" fill="#E6C5C1"/><rect x="12" y="86" width="96" height="18" rx="6" fill="#EEEAEC" stroke="none" stroke-width="2"/><text x="20" y="98" font-size="8.5" fill="#5B4A4F" font-family="sans-serif" font-weight="400">拷貝</text><rect x="12" y="108" width="96" height="18" rx="6" fill="#EEEAEC" stroke="none" stroke-width="2"/><text x="20" y="120" font-size="8.5" fill="#5B4A4F" font-family="sans-serif" font-weight="400">加入書籤</text><rect x="12" y="130" width="96" height="18" rx="6" fill="#FBE7EA" stroke="#E28896" stroke-width="2"/><text x="20" y="142" font-size="8.5" fill="#5B4A4F" font-family="sans-serif" font-weight="700">加入主畫面</text><rect x="88" y="134" width="10" height="10" rx="2.5" fill="none" stroke="#5B4A4F" stroke-width="1.4"/><path d="M93 136 v6 M90 139 h6" stroke="#5B4A4F" stroke-width="1.4"/><rect x="12" y="152" width="96" height="18" rx="6" fill="#EEEAEC" stroke="none" stroke-width="2"/><text x="20" y="164" font-size="8.5" fill="#5B4A4F" font-family="sans-serif" font-weight="400">加入閱讀列表</text><g transform="translate(70 138)"><path d="M0 0 l9 22 l3 -8 l8 -2z" fill="#5B4A4F"/></g></svg><figcaption><b>2</b>選「加入主畫面」</figcaption></figure><figure><svg viewBox="0 0 120 200" role="img" aria-label="iPhone 步驟三：按右上角的「新增」，桌面就會出現圖示"><rect x="4" y="4" width="112" height="192" rx="18" fill="#FFFFFF" stroke="#E6C5C1" stroke-width="2"/><rect x="44" y="10" width="32" height="5" rx="2.5" fill="#EEEAEC"/><text x="16" y="34" font-size="8.5" fill="#5B4A4F" font-family="sans-serif">取消</text><text x="60" y="34" text-anchor="middle" font-size="8.5" fill="#5B4A4F" font-family="sans-serif" font-weight="700">加入主畫面</text><text x="104" y="34" text-anchor="end" font-size="8.5" fill="#E28896" font-family="sans-serif" font-weight="700">新增</text><circle cx="96" cy="31" r="12" fill="none" stroke="#E28896" stroke-width="2.6"/><g transform="translate(99 38)"><path d="M0 0 l9 22 l3 -8 l8 -2z" fill="#5B4A4F"/></g><rect x="14" y="52" width="92" height="40" rx="10" fill="#EEEAEC"/><rect x="22" y="58" width="28" height="28" rx="7" fill="#87605F"/><rect x="27" y="66" width="18" height="13" rx="3" fill="#fff"/><rect x="38" y="70" width="7" height="5" rx="2.5" fill="#DDBEC3"/><text x="56" y="70" font-size="8" fill="#5B4A4F" font-family="sans-serif" font-weight="700">旅遊記帳</text><text x="56" y="82" font-size="6.5" fill="#8A7C80" font-family="sans-serif">wanyun566.github.io</text></svg><figcaption><b>3</b>按右上角「新增」</figcaption></figure><figure><svg viewBox="0 0 120 200" role="img" aria-label="完成：手機桌面出現粉色雲朵圖示"><rect x="4" y="4" width="112" height="192" rx="18" fill="#FFFFFF" stroke="#E6C5C1" stroke-width="2"/><rect x="44" y="10" width="32" height="5" rx="2.5" fill="#EEEAEC"/><rect x="18" y="30" width="22" height="22" rx="6" fill="#EEEAEC"/><rect x="48" y="30" width="22" height="22" rx="6" fill="#EEEAEC"/><rect x="78" y="30" width="22" height="22" rx="6" fill="#EEEAEC"/><rect x="18" y="64" width="22" height="22" rx="6" fill="#EEEAEC"/><rect x="48" y="64" width="22" height="22" rx="6" fill="#EEEAEC"/><rect x="78" y="64" width="22" height="22" rx="6" fill="#87605F"/><rect x="81.5" y="70" width="15" height="11" rx="2.5" fill="#fff"/><rect x="90.5" y="73.5" width="6" height="4" rx="2" fill="#DDBEC3"/><circle cx="89" cy="75" r="16" fill="none" stroke="#E28896" stroke-width="2.6"/><text x="89" y="96" text-anchor="middle" font-size="6.5" fill="#5B4A4F" font-family="sans-serif">旅遊記帳</text></svg><figcaption><b>✓</b>桌面出現圖示</figcaption></figure></div><h5>Android（Chrome）</h5><div class="hsteps two"><figure><svg viewBox="0 0 120 200" role="img" aria-label="Android 步驟一：點右上角的三個點"><rect x="4" y="4" width="112" height="192" rx="18" fill="#FFFFFF" stroke="#E6C5C1" stroke-width="2"/><rect x="44" y="10" width="32" height="5" rx="2.5" fill="#EEEAEC"/><rect x="10" y="20" width="84" height="18" rx="9" fill="#EEEAEC"/><text x="18" y="32" font-size="7.5" fill="#5B4A4F" font-family="sans-serif">網址</text><circle cx="104" cy="23" r="1.7" fill="#5B4A4F"/><circle cx="104" cy="29" r="1.7" fill="#5B4A4F"/><circle cx="104" cy="35" r="1.7" fill="#5B4A4F"/><circle cx="104" cy="29" r="11" fill="none" stroke="#E28896" stroke-width="2.6"/><g transform="translate(106 34)"><path d="M0 0 l9 22 l3 -8 l8 -2z" fill="#5B4A4F"/></g><rect x="16" y="54" width="70" height="6" rx="3" fill="#EEEAEC"/><rect x="16" y="68" width="88" height="6" rx="3" fill="#EEEAEC"/><rect x="16" y="82" width="60" height="6" rx="3" fill="#EEEAEC"/><rect x="16" y="104" width="88" height="6" rx="3" fill="#EEEAEC"/><rect x="16" y="118" width="74" height="6" rx="3" fill="#EEEAEC"/></svg><figcaption><b>1</b>點右上角「⋮」</figcaption></figure><figure><svg viewBox="0 0 120 200" role="img" aria-label="Android 步驟二：選「加到主畫面」或「安裝應用程式」"><rect x="4" y="4" width="112" height="192" rx="18" fill="#FFFFFF" stroke="#E6C5C1" stroke-width="2"/><rect x="44" y="10" width="32" height="5" rx="2.5" fill="#EEEAEC"/><rect x="40" y="18" width="72" height="92" rx="8" fill="#FFFFFF" stroke="#E6C5C1" stroke-width="1.5"/><rect x="44" y="22" width="64" height="16" rx="5" fill="none" stroke="none" stroke-width="2"/><text x="50" y="33" font-size="8" fill="#5B4A4F" font-family="sans-serif" font-weight="400">新分頁</text><rect x="44" y="42" width="64" height="16" rx="5" fill="none" stroke="none" stroke-width="2"/><text x="50" y="53" font-size="8" fill="#5B4A4F" font-family="sans-serif" font-weight="400">書籤</text><rect x="44" y="62" width="64" height="16" rx="5" fill="#FBE7EA" stroke="#E28896" stroke-width="2"/><text x="50" y="73" font-size="8" fill="#5B4A4F" font-family="sans-serif" font-weight="700">加到主畫面</text><rect x="44" y="82" width="64" height="16" rx="5" fill="none" stroke="none" stroke-width="2"/><text x="50" y="93" font-size="8" fill="#5B4A4F" font-family="sans-serif" font-weight="400">設定</text><g transform="translate(84 72)"><path d="M0 0 l9 22 l3 -8 l8 -2z" fill="#5B4A4F"/></g></svg><figcaption><b>2</b>選「加到主畫面」</figcaption></figure></div><p class="hnote">※ 示意圖，實際畫面依手機型號和系統版本可能略有不同。</p></div>
         <div class="actions" id="installWrap" hidden><button type="button" class="small" id="installBtn">安裝到主畫面</button></div>
         <p class="hint warn" style="margin:8px 0 0">⚠️ iPhone 的主畫面和 Safari 是分開存資料的。已經在 Safari 記過帳的話，先在 Safari 按上面的「匯出備份」，再從主畫面打開後按「匯入備份」。</p>
       </div>
@@ -1494,7 +1559,7 @@
       var info = [];
       if (t.totalBudget && b) info.push('占預算 ' + pct(b, t.totalBudget) + '%');
       if (b) info.push('已用 ' + pct(s, b) + '%');
-      rows += '<tr><td class="catcell"><span class="tag">' + c + '</span>' +
+      rows += '<tr><td class="catcell"><span class="tag">' + catIcon(c) + c + '</span>' +
         (info.length ? '<span class="meta">' + info.join('・') + '</span>' : '') +
         '<div class="bar"><span class="' + (s > b ? 'over' : '') + '" style="width:' + p + '%"></span></div></td>' +
         '<td data-label="預算" class="num">' + money(b) + '</td>' +
@@ -1570,7 +1635,7 @@
 
     var top = ex.slice().sort(function (a, b) { return b.amount - a.amount; }).slice(0, 5);
     $('topList').innerHTML = top.length ? top.map(function (e) {
-      return '<li>' + esc(e.item) + '・<span class="tag gray">' + esc(e.category) + '</span> <b>' + money(e.amount) + '</b> <span class="meta" style="display:inline">' + esc(e.date) + '</span></li>';
+      return '<li>' + esc(e.item) + '・<span class="tag gray">' + catIcon(e.category) + esc(e.category) + '</span> <b>' + money(e.amount) + '</b> <span class="meta" style="display:inline">' + esc(e.date) + '</span></li>';
     }).join('') : '<li class="hint" style="list-style:none;margin-left:-22px">還沒有花費紀錄。</li>';
 
     // 代購／伴手禮
@@ -1614,7 +1679,7 @@
     if ($('liveMsg') && $('liveMsg').dataset.cur !== cur) { $('liveMsg').textContent = ''; $('liveMsg').dataset.cur = cur; }
     $('expAmountLabel').textContent = '金額（' + curName(cur) + '）';
     var el = $('convertHint');
-    if (isTWD) { el.innerHTML = ''; return; }
+    if (isTWD) { el.innerHTML = ''; if (typeof syncChips === 'function') syncChips(); return; }
     var a = Number($('expAmount').value), r = Number($('expRate').value), unit = '1 ' + curName(cur);
     var src = { cash: '現金：使用你的換匯成本', preset: '旅行設定的預設匯率', last: '上次使用的匯率', manual: '自行輸入', live: '今天的參考匯率' }[rateSrc] || '';
     var lines = [];
@@ -1631,6 +1696,7 @@
     if (avg && rateSrc !== 'cash') lines.push('你的換匯成本：' + num(Math.round(avg * 1e6) / 1e6) + ' <button type="button" class="linkbtn" id="useAvgRate">套用</button>');
     el.innerHTML = lines.join('<br>');
     if ($('useAvgRate')) $('useAvgRate').onclick = function () { $('expRate').value = Math.round(avg * 1e6) / 1e6; rateSrc = 'cash'; updateCurrencyUI(); };
+    if (typeof syncChips === 'function') syncChips();
   }
   function onCurrencyChange() {
     autoRate();
@@ -1641,7 +1707,7 @@
   function renderSplitUI(payer, split, shares) {
     var m = T().members;
     $('splitBlock').style.display = m.length ? '' : 'none';
-    if (!m.length) return;
+    if (!m.length) { if (typeof syncChips === 'function') syncChips(); return; }
     var opts = m.slice();
     if (m.length >= 2) opts.unshift(POOL);
     if (opts.indexOf(payer) < 0) payer = m[0];
@@ -1651,9 +1717,10 @@
     }).join('');
     $('expSplit').innerHTML = m.map(function (n) {
       var w = shares && Number(shares[n]) > 0 ? Number(shares[n]) : 1;
-      return '<label><input type="checkbox" value="' + esc(n) + '"' + (split.indexOf(n) >= 0 ? ' checked' : '') + '>' + esc(n) +
-        ' <input type="number" class="w" data-w="' + esc(n) + '" min="0.1" step="0.5" inputmode="decimal" value="' + w + '" aria-label="' + esc(n) + ' 的份數"><span class="unit">份</span></label>';
+      return '<label><input type="checkbox" value="' + esc(n) + '"' + (split.indexOf(n) >= 0 ? ' checked' : '') + '>' + avatar(n) + '<span>' + esc(n) + '</span>' +
+        '<span class="stp"><button type="button" data-st="-1" aria-label="' + esc(n) + ' 少半份">−</button><input type="number" class="w" data-w="' + esc(n) + '" min="0.1" step="0.5" inputmode="decimal" value="' + w + '" aria-label="' + esc(n) + ' 的份數"><button type="button" data-st="1" aria-label="' + esc(n) + ' 多半份">＋</button><span class="unit">份</span></span></label>';
     }).join('');
+    if (typeof syncChips === 'function') syncChips();
     renderReceiptOwners();
   }
   function currentSplit() {
@@ -1991,7 +2058,7 @@
       return '<tr' + (batchMode && picked[e.id] ? ' class="picked"' : '') + '>' +
         '<td data-label="日期">' + esc(e.date) + '</td>' +
         '<td data-label="項目"><div>' + esc(e.item) + meta.map(function (m) { return '<span class="meta">' + m + '</span>'; }).join('') + '</div></td>' +
-        '<td data-label="類別"><span class="tag">' + esc(e.category) + '</span></td>' +
+        '<td data-label="類別"><span class="tag">' + catIcon(e.category) + esc(e.category) + '</span></td>' +
         '<td data-label="金額" class="num"><div>' + money(e.amount) + amtMeta + '</div></td>' +
         '<td data-label="' + (batchMode ? '選取' : '操作') + '" class="num">' + (batchMode
           ? '<label class="pick"><input type="checkbox" data-pick="' + esc(e.id) + '"' + (picked[e.id] ? ' checked' : '') + '>選取</label>'
@@ -2080,11 +2147,11 @@
       var b = Math.round(r.bal[n]);
       var cls = b < 0 ? 'neg' : (b > 0 ? 'pos' : '');
       var txt = b > 0 ? '應收 ' + money(b) : (b < 0 ? '應付 ' + money(-b) : '已打平');
-      return '<tr><td data-label="旅伴"><b>' + esc(n) + '</b></td><td data-label="已付" class="num">' + money(r.paid[n]) + '</td>' +
+      return '<tr><td data-label="旅伴"><span class="mvrow">' + avatar(n) + '<b>' + esc(n) + '</b></span></td><td data-label="已付" class="num">' + money(r.paid[n]) + '</td>' +
         '<td data-label="個人花費" class="num">' + money(r.owed[n]) + '</td><td data-label="結果" class="num ' + cls + '">' + txt + '</td></tr>';
     }).join('');
     $('settleMoves').innerHTML = r.moves.length ? r.moves.map(function (mv) {
-      return '<li><span>' + esc(mv.from) + ' → ' + esc(mv.to) + '：<b>' + money(mv.amount) + '</b></span>' +
+      return '<li><span class="mvrow">' + avatar(mv.from) + '<span>' + esc(mv.from) + '</span><span class="arr">→</span>' + avatar(mv.to) + '<span>' + esc(mv.to) + '</span><b>' + money(mv.amount) + '</b></span>' +
         '<button class="small assist" data-act="settle" data-from="' + esc(mv.from) + '" data-to="' + esc(mv.to) + '" data-amt="' + mv.amount + '">標記已轉帳</button></li>';
     }).join('') : '<li class="hint" style="border:none">目前大家已經打平，不需要互相轉帳。</li>';
     var poolOver = r.pool.leftT < -0.5;
@@ -2708,6 +2775,73 @@
   $('quickIn').addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); quickApply(); } });
   $('liveRate').addEventListener('click', liveRateClick);
   renderSumCard();
+  // ---------- 點選式輸入 ----------
+  var curMore = false;
+  function ico(id, cls) { return '<svg class="' + (cls || 'ic-c') + '" aria-hidden="true"><use href="#' + id + '"/></svg>'; }
+  function catIcon(c) { var i = CATEGORIES.indexOf(c); return ico('c' + (i < 0 ? 9 : i)); }
+  var CAT_SHORT = { 'ETC／高速公路費': 'ETC 過路費', '景點門票': '門票' };
+  function chipBtn(g, v, label, ic, on, extra) {
+    return '<button type="button" class="chip' + (on ? ' on' : '') + (extra ? ' ' + extra : '') + '" data-g="' + g + '" data-v="' + esc(v) + '" aria-pressed="' + (on ? 'true' : 'false') + '">' + (ic || '') + '<span>' + label + '</span></button>';
+  }
+  function dayStr(n) { var x = new Date(); x.setDate(x.getDate() + n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); }
+  function avIdx(n) { var i = T().members.indexOf(n); return i < 0 ? 0 : i % 6; }
+  function avatar(n) { return n === POOL ? '<span class="av kp">' + ico('i-wallet') + '</span>' : '<span class="av k' + avIdx(n) + '">' + esc(Array.from(n)[0] || '?') + '</span>'; }
+  function syncChips() {
+    if (!$('catChips')) return;
+    var t = T(), cat = $('expCat').value, d = $('expDate').value, cur = $('expCurrency').value, pay = $('expPay').value, need = $('expNeed').value;
+    $('catChips').innerHTML = CATEGORIES.map(function (c, i) { return chipBtn('cat', c, ({ 'ETC／高速公路費': 'ETC 過路費', '景點門票': '門票' })[c] || c, ico('c' + i), cat === c); }).join('');
+    $('dateChips').innerHTML = [[0, '今天'], [-1, '昨天'], [-2, '前天']].map(function (x) { var v = dayStr(x[0]); return chipBtn('date', v, x[1], '', d === v); }).join('');
+    var list = ['TWD'];
+    function addC(c) { if (c && validCur(c) && list.indexOf(c) < 0) list.push(c); }
+    addC(t.lastCurrency); Object.keys(t.presetRates || {}).forEach(addC); t.expenses.forEach(function (e) { addC(e.currency); }); t.exchanges.forEach(function (x) { addC(x.currency); }); addC(cur);
+    list = list.slice(0, 6);
+    $('curChips').innerHTML = list.map(function (c) { return chipBtn('cur', c, curName(c), '', cur === c); }).join('') +
+      chipBtn('curmore', '', curMore ? '收起其他幣別' : '其他幣別…', '', false, 'more');
+    $('expCurrency').classList.toggle('vh', !curMore);
+    $('payChips').innerHTML = PAYS.map(function (x, i) { return chipBtn('pay', x, x, ico('p' + i), pay === x); }).join('');
+    $('needChips').innerHTML = [['必要', '必要支出'], ['非必要', '非必要支出']].map(function (x) { return chipBtn('need', x[0], x[1], '', need === x[0]); }).join('');
+    var ps = $('payerChips');
+    if (ps && $('splitBlock').style.display !== 'none') {
+      var pv = $('expPayer').value;
+      ps.innerHTML = Array.prototype.map.call($('expPayer').options, function (o) {
+        return '<button type="button" class="chip' + (o.value === pv ? ' on' : '') + '" data-g="payer" data-v="' + esc(o.value) + '" aria-pressed="' + (o.value === pv) + '">' + avatar(o.value) + '<span>' + esc(o.value === POOL ? '公費' : o.value) + '</span></button>';
+      }).join('');
+    }
+  }
+  function fire(el, type) { el.dispatchEvent(new Event(type || 'change', { bubbles: true })); }
+  $('expFormCard').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button.chip[data-g]');
+    if (b) {
+      var g = b.dataset.g, v = b.dataset.v;
+      if (g === 'cat') { $('expCat').value = v; fire($('expCat')); }
+      else if (g === 'date') { $('expDate').value = v; fire($('expDate')); fire($('expDate'), 'input'); }
+      else if (g === 'cur') { $('expCurrency').value = v; onCurrencyChange(); fire($('expCurrency')); }
+      else if (g === 'curmore') { curMore = !curMore; }
+      else if (g === 'pay') { $('expPay').value = $('expPay').value === v ? '' : v; fire($('expPay')); autoRate(); updateCurrencyUI(); }
+      else if (g === 'need') { $('expNeed').value = $('expNeed').value === v ? '' : v; fire($('expNeed')); }
+      else if (g === 'payer') { $('expPayer').value = v; fire($('expPayer')); }
+      syncChips();
+      return;
+    }
+    var st = ev.target.closest('button[data-st]');
+    if (st) {
+      var inp = st.parentNode.querySelector('input.w'), nv = Math.round(((Number(inp.value) || 1) + Number(st.dataset.st) * 0.5) * 10) / 10;
+      inp.value = Math.max(0.5, nv); fire(inp, 'input'); return;
+    }
+    var q = ev.target.closest('button[data-sq]');
+    if (q) {
+      var boxes = $('expSplit').querySelectorAll('input[type=checkbox]'), payer = $('expPayer').value;
+      if (q.dataset.sq === 'all') boxes.forEach(function (c) { c.checked = true; });
+      if (q.dataset.sq === 'payer') boxes.forEach(function (c) { c.checked = c.value === payer; });
+      if (q.dataset.sq === 'reset') $('expSplit').querySelectorAll('input.w').forEach(function (w) { w.value = 1; });
+      fire($('expSplit'));
+    }
+  });
+  $('expDate').addEventListener('change', syncChips);
+  $('expCat').addEventListener('change', syncChips);
+  $('expPayer').addEventListener('change', syncChips);
+  syncChips();
+
   // ---------- 提醒：LINE 內開啟、備份、3 步驟、主畫面 ----------
   var IN_APP = /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|Barcelona|Threads|MicroMessenger|Messenger/i.test(navigator.userAgent);
   var STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
