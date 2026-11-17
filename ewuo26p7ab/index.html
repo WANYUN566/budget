@@ -404,6 +404,7 @@
   #expFormCard .grid > div:has(#expItem), #expFormCard .grid > div:has(#expAmount) { order: -2; }
   #expFormCard .grid > div:has(#expDate), #expFormCard .grid > div:has(#expCurrency), #expFormCard .grid > div:has(#expPay) { grid-column: 1 / -1; }
   #expFormCard .grid > div:has(#expDate) { order: -1; }
+  #moreFields .grid > div:has(#expInst), #moreFields .grid > div:has(#expNeed) { grid-column: 1 / -1; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; background: var(--paper); color: var(--cocoa); border: 1px solid var(--milktea); font-size: .95rem; font-weight: 500; }
   .chip:hover { background: var(--oat); }
@@ -790,8 +791,9 @@
             </select>
           </div>
           <div>
-            <label for="expInst">分期期數</label>
-            <input id="expInst" type="number" min="2" step="1" inputmode="numeric" placeholder="不分期">
+            <label id="lbInst" for="expInst">分期期數</label>
+            <div class="chips" id="instChips" role="group" aria-labelledby="lbInst"></div>
+            <input id="expInst" type="number" min="2" step="1" inputmode="numeric" placeholder="輸入期數，例如 18" style="margin-top:8px">
           </div>
           <div>
             <label>支出性質</label>
@@ -1781,7 +1783,7 @@
     $('expPay').value = '';
     $('expNeed').value = '';
     $('expFixed').checked = false;
-    $('expInst').value = '';
+    $('expInst').value = ''; if (typeof instOther !== 'undefined') instOther = false;
     $('instHint').textContent = '';
     $('expPre').checked = !!(t.startDate && today() < t.startDate);
     $('expProxy').checked = false; $('expProxyFor').value = ''; $('expProxyGot').checked = false; $('proxyBlock').style.display = 'none';
@@ -2776,7 +2778,7 @@
   $('liveRate').addEventListener('click', liveRateClick);
   renderSumCard();
   // ---------- 點選式輸入 ----------
-  var curMore = false;
+  var curMore = false, instOther = false;
   function ico(id, cls) { return '<svg class="' + (cls || 'ic-c') + '" aria-hidden="true"><use href="#' + id + '"/></svg>'; }
   function catIcon(c) { var i = CATEGORIES.indexOf(c); return ico('c' + (i < 0 ? 9 : i)); }
   var CAT_SHORT = { 'ETC／高速公路費': 'ETC 過路費', '景點門票': '門票' };
@@ -2799,6 +2801,13 @@
       chipBtn('curmore', '', curMore ? '收起其他幣別' : '其他幣別…', '', false, 'more');
     $('expCurrency').classList.toggle('vh', !curMore);
     $('payChips').innerHTML = PAYS.map(function (x, i) { return chipBtn('pay', x, x, ico('p' + i), pay === x); }).join('');
+    var iv = $('expInst').value, preset = ['', '3', '6', '12', '24'];
+    if (instOther === undefined || instOther === null) instOther = false;
+    var custom = instOther || (iv !== '' && preset.indexOf(String(Math.round(Number(iv)))) < 0);
+    $('instChips').innerHTML = [['', '不分期'], ['3', '3 期'], ['6', '6 期'], ['12', '12 期'], ['24', '24 期']].map(function (x) {
+      return chipBtn('inst', x[0], x[1], '', !custom && String(iv === '' ? '' : Math.round(Number(iv))) === x[0]);
+    }).join('') + chipBtn('instother', '', '其他期數', '', custom, 'more');
+    $('expInst').classList.toggle('vh', !custom);
     $('needChips').innerHTML = [['必要', '必要支出'], ['非必要', '非必要支出']].map(function (x) { return chipBtn('need', x[0], x[1], '', need === x[0]); }).join('');
     var ps = $('payerChips');
     if (ps && $('splitBlock').style.display !== 'none') {
@@ -2818,6 +2827,8 @@
       else if (g === 'cur') { $('expCurrency').value = v; onCurrencyChange(); fire($('expCurrency')); }
       else if (g === 'curmore') { curMore = !curMore; }
       else if (g === 'pay') { $('expPay').value = $('expPay').value === v ? '' : v; fire($('expPay')); autoRate(); updateCurrencyUI(); }
+      else if (g === 'inst') { instOther = false; $('expInst').value = v; fire($('expInst'), 'input'); }
+      else if (g === 'instother') { instOther = true; syncChips(); $('expInst').focus(); return; }
       else if (g === 'need') { $('expNeed').value = $('expNeed').value === v ? '' : v; fire($('expNeed')); }
       else if (g === 'payer') { $('expPayer').value = v; fire($('expPayer')); }
       syncChips();
