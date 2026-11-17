@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>旅遊預算與花費管理</title>
-<meta name="robots" content="noindex, nofollow, noarchive"><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow, noarchive"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="icon" href="icon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="icon-180.png"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#F4ECEC"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="旅遊記帳">
 <style>
   /* ===== 玫瑰可可 × 旅行手帳配色 ===== */
   :root {
@@ -398,6 +398,21 @@
   }
 
   /* ===== 列印／存成 PDF ===== */
+  /* 提醒橫幅 */
+  .banner { border-left: 5px solid var(--caramel); }
+  .banner.warnb { border-left-color: var(--brick); background: #FFF4F5; }
+  .banner h2 { font-size: 1.05rem; margin-bottom: 6px; }
+  .banner p { margin: 4px 0; }
+  .banner .actions { margin-top: 10px; }
+  .gsteps { margin: 6px 0 10px; padding-left: 0; list-style: none; counter-reset: g; }
+  .gsteps li { counter-increment: g; display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-top: 1px dashed var(--line); }
+  .gsteps li:first-child { border-top: 0; }
+  .gsteps li::before { content: counter(g); flex: 0 0 28px; height: 28px; border-radius: 50%; background: var(--caramel); color: #fff; font-size: .85rem; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .gsteps li div { flex: 1; }
+  .gsteps b { display: block; }
+  .gsteps button { margin-top: 6px; }
+  .homesteps { margin: 6px 0; padding-left: 20px; }
+  .homesteps li { margin: 4px 0; }
   /* 快速輸入 */
   .qin { background: var(--oat); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; margin: 0 0 14px; }
   .qin label { margin-top: 0; }
@@ -548,6 +563,18 @@
   </nav>
 
   <!-- ========== 總覽 ========== -->
+  <div class="card noprint banner warnb" id="inAppBanner" hidden>
+    <h2>建議改用 Safari／Chrome 打開</h2>
+    <p>你現在是在 LINE、IG 等 App 裡面打開。在這裡記的帳，<b>換成 Safari 打開會看不到</b>（兩邊的資料是分開存的）。</p>
+    <p class="hint">點右上角或右下角的選單（⋯ 或 ⋮），選「用 Safari 開啟」（Android 選「用瀏覽器開啟」），之後都從同一個地方打開。</p>
+    <div class="actions"><button type="button" class="small secondary" id="inAppHide">我知道了</button></div>
+  </div>
+  <div class="card noprint banner" id="bkBanner" hidden>
+    <h2>要不要備份一下？</h2>
+    <p id="bkText"></p>
+    <div class="actions"><button type="button" class="small" id="bkNow">匯出備份</button><button type="button" class="small secondary" id="bkLater">稍後再說</button></div>
+  </div>
+
   <section class="panel" id="tab-overview">
     <div class="intro">
       <p class="lead">出發前先抓好預算，旅途中記下每一筆，回頭就知道花到哪裡、還剩多少。</p>
@@ -960,6 +987,16 @@
 
   <!-- ========== 旅行 ========== -->
   <section class="panel" id="tab-trip">
+    <div class="card noprint" id="guideCard" hidden>
+      <h2 data-kicker="START">3 步驟開始</h2>
+      <ol class="gsteps">
+        <li><div><b>填預算和日期</b><span class="hint">就在下面，填好按「儲存設定」。只填總預算和出發、回程日期也可以。</span></div></li>
+        <li><div><b>記第一筆帳</b><span class="hint">打字或用手機鍵盤的 🎤 說「拉麵 1200 日圓」，就能快速記帳。</span><br><button type="button" class="small secondary" data-go="add">去記帳 →</button></div></li>
+        <li><div><b>看總覽</b><span class="hint">今天還可以花多少、錢都花到哪裡，一眼就知道。</span><br><button type="button" class="small secondary" data-go="overview">去總覽 →</button></div></li>
+      </ol>
+      <div class="actions"><button type="button" class="small assist" id="demoBtn">先看範例旅行</button><button type="button" class="small secondary" id="guideHide">不用再顯示</button></div>
+      <p class="hint" style="margin-bottom:0">範例會另外建立一趟「範例旅行」，不會動到你的資料，看完可以在下方「我的旅行」刪除。</p>
+    </div>
     <div class="card">
       <h2 data-kicker="TRIP PLAN">旅遊預算設定</h2>
       <p class="step">第一步：先設定這趟旅行的總預算與各項預算，完成後按下儲存，再開始記錄旅途中的花費。</p>
@@ -1087,6 +1124,20 @@
         <span class="saved" id="backupMsg"></span>
       </div>
     </div>
+
+    <div class="card noprint" id="homeCard">
+      <h2 data-kicker="HOME SCREEN">加入主畫面，像 App 一樣用</h2>
+      <p id="homeOn" class="hint" hidden style="margin:0">✓ 你現在是從主畫面打開的，沒有網路也能記帳（查匯率需要網路）。</p>
+      <div id="homeOff">
+        <p class="hint" style="margin:0 0 6px">加入後會出現在手機桌面，點一下就能打開；打開過一次之後，<b>沒有網路也能記帳</b>（查匯率需要網路）。</p>
+        <ul class="homesteps">
+          <li><b>iPhone</b>：用 Safari 打開這一頁 → 點下方的「分享」（方框加向上箭頭）→「加入主畫面」</li>
+          <li><b>Android</b>：用 Chrome 打開 → 右上角 ⋮ →「加到主畫面」或「安裝應用程式」</li>
+        </ul>
+        <div class="actions" id="installWrap" hidden><button type="button" class="small" id="installBtn">安裝到主畫面</button></div>
+        <p class="hint warn" style="margin:8px 0 0">⚠️ iPhone 的主畫面和 Safari 是分開存資料的。已經在 Safari 記過帳的話，先在 Safari 按上面的「匯出備份」，再從主畫面打開後按「匯入備份」。</p>
+      </div>
+    </div>
   </section>
 </div>
 
@@ -1106,7 +1157,8 @@
   var PAYS = ['現金', '信用卡', '電子支付', '其他'];
   var CURRENCIES = [
     ['TWD', '新台幣'], ['JPY', '日圓'], ['KRW', '韓元'], ['USD', '美元'], ['EUR', '歐元'],
-    ['CNY', '人民幣'], ['HKD', '港幣'], ['THB', '泰銖'], ['SGD', '新加坡幣'], ['GBP', '英鎊'], ['VND', '越南盾']
+    ['CNY', '人民幣'], ['HKD', '港幣'], ['MOP', '澳門幣'], ['THB', '泰銖'], ['SGD', '新加坡幣'], ['MYR', '馬來西亞令吉'], ['PHP', '菲律賓披索'], ['IDR', '印尼盾'], ['VND', '越南盾'],
+    ['GBP', '英鎊'], ['AUD', '澳幣'], ['NZD', '紐西蘭幣'], ['CAD', '加幣'], ['CHF', '瑞士法郎']
   ];
   function curName(code) {
     for (var i = 0; i < CURRENCIES.length; i++) if (CURRENCIES[i][0] === code) return CURRENCIES[i][1];
@@ -1218,6 +1270,8 @@
         var d = JSON.parse(raw2);
         db.trips = (d.trips || []).map(normTrip);
         db.currentId = d.currentId;
+        db.guideOff = !!d.guideOff;
+        db.bk = (d.bk && typeof d.bk === 'object') ? d.bk : {};
       } else {
         // 從舊版（單一旅行）資料自動轉移；舊資料保留不刪除
         var raw1 = localStorage.getItem(KEY1);
@@ -1803,7 +1857,9 @@
 
   // ---------- 常用金額 ----------
   var PRESETS = { TWD: [100, 300, 500, 1000, 2000], JPY: [500, 1000, 3000, 5000, 10000], KRW: [5000, 10000, 30000, 50000, 100000],
-    VND: [50000, 100000, 200000, 500000], THB: [100, 300, 500, 1000], USD: [10, 20, 50, 100], EUR: [10, 20, 50, 100] };
+    VND: [50000, 100000, 200000, 500000], THB: [100, 300, 500, 1000], USD: [10, 20, 50, 100], EUR: [10, 20, 50, 100],
+    MOP: [20, 50, 100, 300], HKD: [20, 50, 100, 300], MYR: [10, 20, 50, 100], PHP: [100, 300, 500, 1000], IDR: [20000, 50000, 100000, 200000],
+    AUD: [10, 20, 50, 100], NZD: [10, 20, 50, 100], CAD: [10, 20, 50, 100], CHF: [10, 20, 50, 100], GBP: [5, 10, 20, 50] };
   function renderQuickAmts() {
     var t = T(), cur = $('expCurrency').value || 'TWD', count = {}, last = {};
     t.expenses.forEach(function (e, i) {
@@ -2317,6 +2373,9 @@
   function exportBackup() {
     var payload = { app: 'travelBudgetTool', version: 2, exportedAt: new Date().toISOString(), data: db };
     download('旅遊預算_全部旅行備份_' + today() + '.json', JSON.stringify(payload, null, 2), 'application/json');
+    db.bk = db.bk || {}; db.bk.count = allExpCount(); db.bk.at = Date.now(); db.bk.ended = db.bk.ended || {};
+    db.trips.forEach(function (t) { if (t.endDate && today() > t.endDate) db.bk.ended[t.id] = 1; });
+    save(); renderNotes();
     flash('backupMsg', '✓ 已匯出備份檔');
   }
   function importBackup(file) {
@@ -2368,6 +2427,7 @@
     renderSplit();
     renderFx();
     if (typeof renderSumCard === 'function' && $('sumCard')) renderSumCard();
+    if (typeof renderNotes === 'function' && $('bkBanner')) renderNotes();
     renderTrips();
     renderItemList();
     renderQuickAmts();
@@ -2514,7 +2574,9 @@
   // ---------- 快速輸入 ----------
   var Q_CUR = [[/日圓|日幣|日元|円|¥|￥|yen/i, 'JPY'], [/韓元|韓幣|韓圜|₩|won/i, 'KRW'], [/美金|美元|usd|us\$/i, 'USD'], [/歐元|€|eur/i, 'EUR'],
     [/人民幣|rmb|cny/i, 'CNY'], [/港幣|港元|hk\$|hkd/i, 'HKD'], [/泰銖|泰幣|฿|thb/i, 'THB'], [/新加坡幣|新幣|sgd/i, 'SGD'], [/英鎊|£|gbp/i, 'GBP'],
-    [/越南盾|越盾|vnd/i, 'VND'], [/台幣|新台幣|ntd|twd|nt\$/i, 'TWD']];
+    [/越南盾|越盾|vnd/i, 'VND'], [/澳門幣|葡幣|mop/i, 'MOP'], [/令吉|馬幣|馬來西亞幣|myr/i, 'MYR'], [/披索|菲律賓幣|php/i, 'PHP'],
+    [/印尼盾|印尼幣|idr/i, 'IDR'], [/澳幣|澳元|aud/i, 'AUD'], [/紐幣|紐元|紐西蘭幣|nzd/i, 'NZD'], [/加幣|加元|cad/i, 'CAD'], [/瑞士法郎|法郎|chf/i, 'CHF'],
+    [/台幣|新台幣|ntd|twd|nt\$/i, 'TWD']];
   var Q_PAY = [[/刷卡|信用卡|卡片/, '信用卡'], [/現金|付現/, '現金'], [/電子支付|line ?pay|apple ?pay|街口|悠遊付|pay\b|掃碼|行動支付|suica|西瓜卡|t-money|八達通/i, '電子支付']];
   var Q_CAT = [['機票', /機票|航空|班機/], ['住宿', /飯店|旅館|住宿|民宿|hotel|airbnb|旅店|青旅/i], ['租車', /租車/], ['油錢', /加油|油錢|汽油/],
     ['ETC／高速公路費', /etc|過路費|高速公路|高速費|停車/i], ['景點門票', /門票|入場|樂園|博物館|美術館|展覽|纜車|觀景台|水族館/],
@@ -2646,6 +2708,75 @@
   $('quickIn').addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); quickApply(); } });
   $('liveRate').addEventListener('click', liveRateClick);
   renderSumCard();
+  // ---------- 提醒：LINE 內開啟、備份、3 步驟、主畫面 ----------
+  var IN_APP = /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|Barcelona|Threads|MicroMessenger|Messenger/i.test(navigator.userAgent);
+  var STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  var inAppHidden = false, deferredInstall = null;
+  function allExpCount() { return db.trips.reduce(function (a, t) { return a + t.expenses.length; }, 0); }
+  function renderNotes() {
+    $('inAppBanner').hidden = !IN_APP || inAppHidden;
+    var bk = db.bk || {}, total = allExpCount(), base = Math.max(Number(bk.count) || 0, Number(bk.snooze) || 0);
+    var ended = db.trips.filter(function (t) { return t.endDate && today() > t.endDate && t.expenses.length && !(bk.ended && bk.ended[t.id]); });
+    var txt = '';
+    if (ended.length) txt = '「' + (ended[0].name || '這趟旅行') + '」已經結束了，建議匯出一份備份留存。資料只存在這台手機的這個瀏覽器，換手機或清除瀏覽紀錄就會消失。';
+    else if (total - base >= 20) txt = '已經記了 ' + (total - (Number(bk.count) || 0)) + ' 筆還沒備份的花費。資料只存在這台手機的這個瀏覽器，換手機或清除瀏覽紀錄就會消失，建議匯出一份備份。';
+    $('bkBanner').hidden = !txt;
+    $('bkText').textContent = txt;
+    var t = T();
+    $('guideCard').hidden = !!db.guideOff || t.expenses.length > 0;
+    $('homeOn').hidden = !STANDALONE; $('homeOff').hidden = STANDALONE;
+    $('installWrap').hidden = !deferredInstall;
+  }
+  function makeDemo() {
+    var d0 = today(), s = addDay(d0, -2), e = addDay(d0, 2);
+    var ex = [
+      ['機票', '機票', 24000, 'TWD', null, 'A', ['A', '小美', '阿明'], true, addDay(s, -20), '信用卡'],
+      ['飯店 4 晚', '住宿', 18000, 'TWD', null, '小美', ['A', '小美', '阿明'], true, addDay(s, -15), '信用卡'],
+      ['機場快線', '交通', 3000, 'JPY', 0.21, 'A', ['A', '小美', '阿明'], false, s, '現金'],
+      ['拉麵', '餐飲', 3600, 'JPY', 0.21, '阿明', ['A', '小美', '阿明'], false, s, '現金'],
+      ['藥妝', '購物', 8500, 'JPY', 0.21, '小美', ['小美'], false, addDay(s, 1), '信用卡'],
+      ['燒肉晚餐', '餐飲', 15000, 'JPY', 0.21, 'A', ['A', '小美', '阿明'], false, addDay(s, 1), '信用卡'],
+      ['美術館門票', '景點門票', 4500, 'JPY', 0.21, '小美', ['A', '小美', '阿明'], false, d0, '現金'],
+      ['咖啡', '餐飲', 1800, 'JPY', 0.21, '阿明', ['A', '小美', '阿明'], false, d0, '電子支付']
+    ];
+    var t = normTrip({
+      name: '範例旅行（看完可以刪除）', destination: '東京', startDate: s, endDate: e, travelers: 3, totalBudget: 75000, reserve: 3000,
+      catBudgets: { '機票': 24000, '住宿': 18000, '交通': 4000, '餐飲': 12000, '購物': 6000, '景點門票': 3000 },
+      presetRates: { JPY: 0.21 }, members: ['A', '小美', '阿明'], lastCurrency: 'JPY'
+    });
+    ex.forEach(function (x, i) {
+      var adj = x[3] !== 'TWD' && x[9] === '信用卡' ? 1.5 : 0;
+      t.expenses.push({ id: uid('e'), date: x[8], item: x[0], category: x[1], amount: x[3] === 'TWD' ? x[2] : Math.round(x[2] * x[4] * (1 + adj / 100) * 100) / 100,
+        currency: x[3], foreignAmount: x[3] === 'TWD' ? null : x[2], rate: x[4], cardAdj: adj, payer: x[5], split: x[6], shares: null, note: '', time: '', place: '',
+        pay: x[9], need: '', fixed: x[7], inst: 0, pre: x[7], proxy: false, proxyFor: '', proxyGot: false, createdAt: Date.now() + i });
+    });
+    t.exchanges.push({ id: uid('x'), date: addDay(s, -1), currency: 'JPY', foreign: 30000, twd: 6300, fee: 0, note: '機場換匯', pool: false, createdAt: Date.now() });
+    db.trips.push(t);
+    switchTrip(t.id);
+    showTab('overview');
+  }
+  function addDay(d, n) { var x = new Date(d + 'T00:00:00'); x.setDate(x.getDate() + n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); }
+  $('inAppHide').addEventListener('click', function () { inAppHidden = true; renderNotes(); });
+  $('bkNow').addEventListener('click', exportBackup);
+  $('bkLater').addEventListener('click', function () {
+    db.bk = db.bk || {}; db.bk.snooze = allExpCount(); db.bk.ended = db.bk.ended || {};
+    db.trips.forEach(function (t) { if (t.endDate && today() > t.endDate) db.bk.ended[t.id] = 1; });
+    save(); renderNotes();
+  });
+  $('guideHide').addEventListener('click', function () { db.guideOff = true; save(); renderNotes(); });
+  $('demoBtn').addEventListener('click', makeDemo);
+  $('guideCard').addEventListener('click', function (ev) { var b = ev.target.closest('button[data-go]'); if (b) showTab(b.dataset.go); });
+  window.addEventListener('beforeinstallprompt', function (ev) { ev.preventDefault(); deferredInstall = ev; renderNotes(); });
+  $('installBtn').addEventListener('click', function () {
+    if (!deferredInstall) return;
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(function () { deferredInstall = null; renderNotes(); });
+  });
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+  renderNotes();
+
 
   document.addEventListener('click', function (ev) {
     var btn = ev.target.closest('button[data-act]');
