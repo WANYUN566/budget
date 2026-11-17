@@ -1,0 +1,2691 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>旅遊預算與花費管理</title>
+<meta name="robots" content="noindex, nofollow, noarchive"><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<style>
+  /* ===== 玫瑰可可 × 旅行手帳配色 ===== */
+  :root {
+    --cream: #F4ECEC;      /* 背景 */
+    --paper: #FFFAFA;      /* 卡片底色 */
+    --milktea: #DDBEC3;    /* 線條、表頭 */
+    --oat: #FFE6E5;        /* 淡粉：次要區塊 */
+    --caramel: #87605F;    /* 玫瑰可可：重點 */
+    --caramel-btn: #7C5455;/* 主要按鈕 */
+    --cocoa: #443938;      /* 主要文字 */
+    --muted: #6C5D5C;      /* 說明文字 */
+    --sage: #A9B09A;       /* 鼠尾草綠：正常狀態 */
+    --sage-light: #E6E9DF;
+    --sage-text: #5F6E4F;
+    --rose: #F2D3D8;       /* 刪除 */
+    --rose-text: #84303F;
+    --brick: #A3394B;      /* 超支 */
+    --line: #E6D1D4;
+    --ink: #191718; --track: #EFDCDD; --blue: #F1E1E2; --shadow-c: rgba(68, 57, 56, .06);
+    --ok-line: #A9B09A; --warn-bg: #FBE6CF; --warn-text: #74480F; --warn-line: #D69A45; --bad-bg: #F7D7DC; --bad-text: #84283A;
+    --radius: 20px;
+    --shadow: 0 2px 10px rgba(68, 57, 56, .05);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  .grid > *, .card, td { min-width: 0; }
+  input, select, textarea { min-width: 0; max-width: 100%; }
+  input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: none; display: block; min-height: 44px; }
+  input::-webkit-date-and-time-value { text-align: left; }
+  td { overflow-wrap: anywhere; }
+  body {
+    margin: 0; padding: 20px 16px 40px;
+    font-family: "Noto Sans TC", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background: var(--cream); color: var(--cocoa); line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  /* ===== 頁首 ===== */
+  .topbar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .topbar label { margin: 0; font-size: .82rem; color: var(--muted); white-space: nowrap; }
+  .topbar select { width: auto; max-width: 60%; padding: 6px 10px; font-size: .9rem; border-radius: 999px; }
+  h1 {
+    font-size: 1.6rem; font-weight: 700; letter-spacing: .04em;
+    margin: 4px 0 6px; text-align: center; color: var(--cocoa);
+  }
+  .trip-meta { text-align: center; font-size: .88rem; color: var(--muted); margin-bottom: 14px; }
+  .trip-meta .pill {
+    display: inline-block; padding: 2px 10px; margin: 2px 3px; border-radius: 999px;
+    background: var(--paper); border: 1px solid var(--line);
+  }
+  .trip-meta .pill.hl { background: var(--sage-light); color: var(--sage-text); border-color: #D3D8C8; }
+
+  h2 {
+    font-size: 1.12rem; font-weight: 700; color: var(--cocoa);
+    margin: 0 0 14px; padding-bottom: 10px;
+    border-bottom: 1px dashed var(--milktea);
+  }
+
+  .intro { text-align: center; margin: 0 auto 20px; max-width: 640px; }
+  .intro .lead { font-size: 1rem; color: var(--cocoa); margin: 0 0 4px; }
+  .intro .sub { font-size: .92rem; color: var(--caramel); font-weight: 500; margin: 0 0 10px; }
+  .intro .concept { font-size: .86rem; color: var(--muted); margin: 0; }
+
+  .card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 22px 20px;
+    margin-bottom: 20px; box-shadow: var(--shadow);
+  }
+
+  label { display: block; font-size: .9rem; color: var(--cocoa); font-weight: 500; margin-bottom: 6px; }
+  input, select, textarea {
+    width: 100%; padding: 10px 12px; font-size: 1rem; font-family: inherit;
+    color: var(--cocoa); background: #FFFDFD;
+    border: 1px solid var(--milktea); border-radius: 10px;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  input::placeholder, textarea::placeholder { color: #B29FA1; }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--caramel);
+    box-shadow: 0 0 0 3px rgba(124, 84, 85, .18);
+  }
+
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .field { margin-bottom: 14px; }
+  .hint { font-size: .85rem; color: var(--muted); margin-top: 8px; }
+  .warn { color: var(--brick); }
+  .step { font-size: .9rem; color: var(--cocoa); margin: 0 0 14px; }
+
+  /* ===== 按鈕：膠囊圓角、一致高度 ===== */
+  button {
+    min-height: 42px; padding: 0 22px; font-size: 1rem; font-family: inherit; font-weight: 500;
+    border: 1px solid transparent; border-radius: 999px; cursor: pointer;
+    background: var(--caramel-btn); color: #fff;
+    transition: background-color .15s, transform .05s;
+  }
+  button:hover { background: #664344; }
+  button:active { transform: translateY(1px); }
+  button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(124, 84, 85, .3); }
+
+  button.secondary { background: var(--oat); color: var(--cocoa); border-color: var(--milktea); }
+  button.secondary:hover { background: var(--milktea); }
+
+  button.small { min-height: 34px; padding: 0 14px; font-size: .85rem; }
+
+  /* 修改／輔助操作：鼠尾草綠 */
+  button.assist, button[data-act="edit"] { background: var(--sage-light); color: var(--sage-text); border-color: #D3D8C8; }
+  button.assist:hover, button[data-act="edit"]:hover { background: #D9DECF; }
+
+  /* 刪除：低彩度灰粉色 */
+  button.danger { background: var(--rose); color: var(--rose-text); border-color: #D8BFBA; }
+  button.danger:hover { background: #D9C0BB; }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; align-items: center; }
+  .saved { color: var(--sage-text); font-size: .88rem; font-weight: 500; }
+
+  /* ===== 分頁導覽 ===== */
+  .tabs {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
+    padding: 8px 0 12px; margin-bottom: 8px; background: var(--cream);
+  }
+  .tabs .tab {
+    min-height: 38px; padding: 0 16px; font-size: .95rem;
+    background: var(--paper); color: var(--cocoa); border: 1px solid var(--milktea);
+  }
+  .tabs .tab:not(.active):hover { background: var(--oat); }
+  .tabs .tab.active { background: var(--caramel-btn); color: #fff; border-color: var(--caramel-btn); }
+  .tabs .tab { display: inline-flex; align-items: center; }
+  .ic, .ic-s { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .ic { width: 22px; height: 22px; stroke-width: 1.5; margin-right: 5px; }
+  .ic-s { width: 1.15em; height: 1.15em; stroke-width: 1.7; vertical-align: -.22em; margin-right: 3px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ===== 統計區 ===== */
+  .summary { display: grid; gap: 12px; grid-template-columns: repeat(3, 1fr); margin-bottom: 14px; }
+  .box {
+    background: var(--oat); border: 1px solid var(--line);
+    border-radius: 14px; padding: 14px 12px; text-align: center;
+  }
+  .box .t { font-size: .85rem; color: #6C5D5C; }
+  .box .v { font-size: 1.35rem; font-weight: 700; margin-top: 4px; word-break: break-all; color: var(--cocoa); }
+  .box .t.neg { color: #9A4E47; font-weight: 500; margin-top: 2px; }
+  .minis { display: grid; gap: 10px; grid-template-columns: repeat(4, 1fr); margin-bottom: 20px; }
+  .mini { border: 1px dashed var(--milktea); border-radius: 12px; padding: 8px 10px; text-align: center; }
+  .mini .t { font-size: .78rem; color: var(--muted); }
+  .mini .v { font-size: 1rem; font-weight: 600; }
+  .neg { color: var(--brick); }
+  .pos { color: var(--sage-text); }
+  .note {
+    font-size: .85rem; color: var(--cocoa);
+    background: var(--oat); border: 1px solid var(--milktea);
+    border-left: 4px solid var(--sage);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 20px;
+  }
+
+  /* 提醒 */
+  .alerts { list-style: none; margin: 0; padding: 0; }
+  .alerts li {
+    padding: 9px 12px; border-radius: 10px; margin-bottom: 8px; font-size: .92rem;
+    background: var(--sage-light); color: var(--sage-text);
+  }
+  .alerts li.w { background: #F5E9DA; color: #7A5634; }
+  .alerts li.d { background: #F3E1DE; color: var(--rose-text); }
+
+  table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  th, td { padding: 11px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+  th { background: var(--milktea); font-weight: 600; color: var(--cocoa); font-size: .9rem; }
+  th:first-child { border-top-left-radius: 10px; }
+  th:last-child { border-top-right-radius: 10px; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  #catTable td.num { font-weight: 500; }
+  .bar { height: 6px; background: #F0DEDF; border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .bar span { display: block; height: 100%; background: var(--caramel); border-radius: 3px; }
+  .bar span.over { background: #C48A84; }
+  .empty { text-align: center; color: var(--muted); padding: 24px; }
+  .tag {
+    display: inline-block; padding: 2px 10px; border-radius: 999px;
+    background: var(--sage-light); color: var(--sage-text); font-size: .85rem;
+    white-space: nowrap;
+  }
+  .tag.gray { background: var(--oat); color: var(--muted); }
+  .meta { display: block; font-size: .8rem; color: var(--muted); margin-top: 2px; font-weight: 400; }
+
+  /* 每日花費長條 */
+  .daybars { display: flex; flex-direction: column; gap: 8px; }
+  .dayrow { display: grid; grid-template-columns: 86px 1fr 96px; gap: 10px; align-items: center; font-size: .88rem; }
+  .dayrow .track { height: 14px; background: #F0DEDF; border-radius: 7px; overflow: hidden; }
+  .dayrow .track span { display: block; height: 100%; background: var(--caramel); border-radius: 7px; }
+  .dayrow .track span.over { background: #C48A84; }
+  .dayrow .amt { text-align: right; white-space: nowrap; }
+  .facts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-top: 18px; }
+  .fact { background: var(--oat); border-radius: 12px; padding: 10px 12px; }
+  .fact .t { font-size: .8rem; color: var(--muted); }
+  .fact .v { font-weight: 600; }
+  .ranklist { margin: 0; padding-left: 22px; }
+  .ranklist li { margin: 4px 0; }
+
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 8px 0; }
+  .checks label { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: 400; cursor: pointer; }
+  .checks input { width: 18px; height: 18px; accent-color: var(--caramel); }
+  .subhead { font-size: .95rem; font-weight: 600; color: var(--cocoa); margin: 18px 0 8px; }
+  .moves { margin: 0; padding: 0; list-style: none; }
+  .moves li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+
+  details.more { margin-top: 14px; border: 1px dashed var(--milktea); border-radius: 12px; padding: 4px 14px; }
+  details.more summary { cursor: pointer; padding: 8px 0; color: var(--caramel); font-weight: 500; font-size: .92rem; }
+  details.more[open] { padding-bottom: 14px; }
+  .linkbtn { background: none; border: none; color: var(--caramel); padding: 0; min-height: 0; font-size: .85rem; text-decoration: underline; }
+  .linkbtn:hover { background: none; color: var(--caramel-btn); }
+  details.filtercard { padding-top: 16px; padding-bottom: 16px; }
+  details.filtercard > summary { list-style: none; cursor: pointer; }
+  details.filtercard > summary::-webkit-details-marker { display: none; }
+  details.filtercard > summary h2 { margin: 0; padding: 0; border: none; display: flex; justify-content: space-between; align-items: center; }
+  details.filtercard > summary h2::after { content: '展開 ▾'; font-size: .85rem; font-weight: 500; color: var(--caramel); }
+  details.filtercard[open] > summary h2 { margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px dashed var(--milktea); }
+  details.filtercard[open] > summary h2::after { content: '收合 ▴'; }
+  .quick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+  .quick .ql { font-size: .82rem; color: var(--muted); margin-right: 2px; }
+  .quick button { min-height: 32px; padding: 0 12px; font-size: .88rem; background: var(--paper); color: var(--cocoa); border: 1px solid var(--milktea); }
+  .quick button:hover { background: var(--oat); }
+  .checkline { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; font-weight: 400; cursor: pointer; }
+  .checkline input { width: 20px; height: 20px; accent-color: var(--caramel-btn); }
+  .batchbar { background: var(--cream); border: 1px dashed var(--milktea); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+  .pick { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: 500; cursor: pointer; }
+  .pick input { width: 20px; height: 20px; accent-color: var(--caramel-btn); }
+  tr.picked td { background: var(--oat); }
+  .batchbar .grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .checks .w { width: 64px; min-height: 34px; padding: 4px 6px; font-size: .9rem; }
+  .checks .unit { font-size: .82rem; color: var(--muted); }
+  .rrow { display: grid; grid-template-columns: 1fr 96px; gap: 6px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--line); }
+  .rrow .rm { min-height: 40px; padding: 0 12px; }
+  .today-v { font-size: 1.9rem; font-weight: 700; color: var(--ink); line-height: 1.3; }
+  .today-v.neg { color: var(--brick); }
+  .today-s { font-size: .95rem; color: var(--muted); margin-top: 2px; }
+  .sub2 { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+  .dispcur { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin: -6px 0 12px; }
+  .dispcur label { margin: 0; font-size: .85rem; color: var(--muted); font-weight: 400; white-space: nowrap; }
+  .dispcur select { width: auto; padding: 6px 10px; font-size: .9rem; border-radius: 999px; }
+  .poolbal { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .poolbal .box { flex: 1 1 140px; }
+  .filter-sum { font-size: .9rem; margin: 0 0 10px; }
+
+  @media (max-width: 600px) {
+    body { padding: 14px 10px calc(90px + env(safe-area-inset-bottom)); }
+    .card { padding: 18px 14px; }
+    .summary { grid-template-columns: 1fr; }
+    .topbar select { font-size: 16px; max-width: 65%; }
+    h1 { font-size: 1.4rem; }
+    .box .v { font-size: 1.25rem; }
+    .stack td.catcell { display: block; text-align: left; padding-bottom: 8px; }
+    .stack td.catcell::before { content: none; }
+    .stack td.catcell .bar { margin-top: 8px; }
+    .minis { grid-template-columns: repeat(2, 1fr); }
+    /* 手機版：分頁改為底部導覽列 */
+    .tabs {
+      position: fixed; top: auto; bottom: 0; left: 0; right: 0; margin: 0;
+      flex-wrap: nowrap; gap: 2px; justify-content: space-around;
+      background: var(--paper); border-top: 1px solid var(--line);
+      padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+      box-shadow: 0 -2px 10px rgba(102, 83, 68, .06);
+    }
+    .tabs .tab {
+      flex: 1; min-height: 50px; padding: 2px 0; font-size: .72rem; line-height: 1.2;
+      border: none; border-radius: 12px; background: transparent;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .tabs .tab .ic { display: block; width: 25px; height: 25px; margin: 0 0 2px; }
+    .tabs .tab.active { background: var(--oat); color: var(--cocoa); font-weight: 700; border: none; }
+    .dayrow { grid-template-columns: 70px 1fr 84px; font-size: .82rem; }
+    /* 手機版：表格改成卡片式 */
+    .stack thead { display: none; }
+    .stack tr {
+      display: block; background: #FFFDFD; border: 1px solid var(--line);
+      border-radius: 12px; margin-bottom: 12px; padding: 10px;
+    }
+    .stack td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 5px 4px; text-align: right; }
+    .stack td::before { content: attr(data-label); color: var(--muted); text-align: left; margin-right: auto; padding-right: 10px; flex-shrink: 0; white-space: nowrap; }
+    .stack td[data-label="操作"] { gap: 6px; flex-wrap: wrap; }
+    .stack td > div { text-align: right; }
+    .stack td.empty { display: block; text-align: center; }
+    .stack td.empty::before { content: none; }
+    .stack tr.picked { background: var(--oat); }
+    .dispcur select { font-size: 16px; }
+  }
+
+  /* ===== 日系旅行手帳風格 ===== */
+  body { letter-spacing: .02em; }
+  h1 { color: var(--ink); font-weight: 700; letter-spacing: .1em; font-size: 1.7rem; margin: 2px 0 10px; }
+  h2 {
+    color: var(--ink); font-weight: 700; font-size: 1.12rem; letter-spacing: .06em;
+    border-bottom: 1px solid var(--milktea); padding-bottom: 12px; margin-bottom: 18px;
+  }
+  h2[data-kicker]::before {
+    content: attr(data-kicker); display: block; margin-bottom: 4px;
+    font-size: .66rem; font-weight: 500;
+    letter-spacing: .32em; color: var(--caramel);
+  }
+  .card { border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: 26px 22px; }
+
+  /* 封面 */
+  .hero {
+    position: relative; overflow: hidden; border-radius: 24px; margin-bottom: 18px;
+    background: linear-gradient(180deg, #FFFDF9 0%, #F5EFE5 62%, #EAEFF2 100%);
+    border: 1px solid #E9DFD0; padding: 16px 18px 92px; text-align: center;
+  }
+  .hero .topbar { position: relative; z-index: 1; }
+  .hero .kicker {
+    font-size: .7rem; font-weight: 500; letter-spacing: .36em;
+    color: var(--caramel); margin: 14px 0 6px;
+  }
+  .hero h1, .hero .trip-meta { position: relative; z-index: 1; }
+  .hero .scene { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 560px; height: auto; }
+  @media (min-width: 601px) { .hero { padding-bottom: 150px; } }
+  .trip-meta .pill { background: rgba(255, 253, 249, .85); border-color: #E2D6C5; color: #4B3D33; }
+  .hero .kicker { color: #85674E; }
+  .hero .topbar label { color: #7B6D61; }
+  .hero .topbar select { border-color: #E2D6C5; background: #FFFDF9; }
+  .trip-meta .pill.hl { background: #E6EDF2; color: #4D6273; border-color: #CFDBE3; }
+
+  /* 引言 */
+  .intro { margin: 6px auto 22px; padding: 4px 8px; }
+  .intro .lead { font-size: 1.02rem; color: var(--ink); line-height: 1.9; }
+  .intro .sub { color: var(--caramel); font-weight: 400; letter-spacing: .1em; }
+  .intro .sub::after { content: ''; display: block; width: 36px; height: 1px; background: var(--caramel); opacity: .5; margin: 12px auto 0; }
+
+  /* 按鈕 */
+  button:hover { background: #664344; }
+  button.secondary { background: var(--paper); border-color: var(--milktea); color: var(--cocoa); }
+  button.secondary:hover { background: var(--oat); }
+  button.assist, button[data-act="edit"] { background: var(--sage-light); color: var(--sage-text); border-color: #D3D8C8; }
+  button.assist:hover, button[data-act="edit"]:hover { background: #D9DECF; }
+  button.danger { border-color: #E3C0C6; }
+  button.danger:hover { background: #EBC9CF; }
+  input, select, textarea { background: #FFFDFD; border-color: var(--milktea); }
+  input::placeholder, textarea::placeholder { color: #B29FA1; }
+  input:focus, select:focus, textarea:focus { border-color: var(--caramel); box-shadow: 0 0 0 3px rgba(124, 84, 85, .14); }
+
+  /* 統計 */
+  .box { background: var(--paper); border: 1px solid var(--milktea); border-radius: 16px; padding: 16px 12px; }
+  .box .t { color: var(--muted); letter-spacing: .08em; }
+  .box .v { color: var(--ink); font-weight: 700; font-size: 1.4rem; }
+  .summary .box:nth-child(3) { background: var(--blue); border-color: var(--milktea); }
+  .summary .box:nth-child(3) .v { color: var(--ink); }
+  .summary .box:nth-child(3):has(.v.neg) { background: var(--bad-bg); border-color: #E8BCC4; }
+  .summary .box:nth-child(3):has(.v.neg) .v, .box .t.neg { color: var(--bad-text); }
+  .mini { border: 1px solid var(--line); background: var(--cream); border-radius: 14px; }
+  .mini .v { color: var(--ink); }
+  .fact { background: var(--cream); border: 1px solid var(--line); }
+  .fact .v { color: var(--ink); font-weight: 600; }
+  th { background: var(--oat); color: var(--ink); font-weight: 600; letter-spacing: .06em; }
+  .bar, .dayrow .track { background: var(--track); }
+  .bar { height: 8px; border-radius: 4px; }
+  .bar span, .dayrow .track span { background: var(--caramel); }
+  .bar span.over, .dayrow .track span.over { background: var(--brick); }
+  .dayrow .track { height: 12px; }
+  .tag { background: var(--sage-light); color: var(--sage-text); }
+  .tag.gray { background: var(--oat); color: var(--muted); }
+
+  /* 提醒 */
+  .alerts li { background: var(--sage-light); color: var(--sage-text); border-left: 3px solid var(--sage); border-radius: 4px 12px 12px 4px; }
+  .alerts li.w { background: var(--warn-bg); color: var(--warn-text); border-left-color: var(--warn-line); }
+  .alerts li.d { background: var(--bad-bg); color: var(--bad-text); border-left-color: var(--brick); }
+  .note { background: var(--paper); border: 1px solid var(--line); border-left: 3px solid var(--caramel); color: var(--muted); }
+
+  /* 分頁：電腦版為細線標籤 */
+  .tabs { background: var(--cream); gap: 4px; border-bottom: 1px solid var(--milktea); padding: 4px 0 0; margin-bottom: 22px; }
+  .tabs .tab {
+    background: transparent; border: none; border-radius: 0; color: var(--muted);
+    border-bottom: 2px solid transparent; padding: 0 16px; min-height: 44px; letter-spacing: .08em;
+  }
+  .tabs .tab:not(.active):hover { background: transparent; color: var(--ink); }
+  .tabs .tab.active { background: transparent; color: var(--ink); border-bottom-color: var(--caramel-btn); font-weight: 600; }
+
+  details.filtercard > summary h2 { justify-content: flex-start; }
+  details.filtercard > summary h2::after { margin-left: auto; }
+
+  @media (max-width: 600px) {
+    .card { padding: 22px 16px; border-radius: 18px; }
+    .hero { padding: 12px 14px 84px; border-radius: 20px; }
+    h1 { font-size: 1.45rem; letter-spacing: .08em; }
+    /* 手機版：底部導覽 */
+    .tabs { border-bottom: none; border-top: 1px solid var(--milktea); background: rgba(255, 253, 249, .96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .tabs .tab { border: none; color: var(--muted); border-radius: 14px; }
+    .tabs .tab.active { color: var(--ink); background: var(--oat); border: none; font-weight: 600; }
+  }
+
+  /* ===== 列印／存成 PDF ===== */
+  /* 快速輸入 */
+  .qin { background: var(--oat); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; margin: 0 0 14px; }
+  .qin label { margin-top: 0; }
+  .qrow { display: flex; gap: 8px; }
+  .qrow input { flex: 1; min-width: 0; }
+  .qrow button { flex: 0 0 auto; }
+  .qin .hint { margin: 6px 0 0; }
+  /* 即時匯率 */
+  #rateField { grid-column: 1 / -1; }
+  .liverow { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 6px; }
+  /* 旅行總結 */
+  .smk { position: fixed; inset: 0; z-index: 50; background: rgba(40, 30, 30, .55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .smk[hidden] { display: none; }
+  .smb { background: var(--paper); border-radius: 20px; padding: 16px; width: 100%; max-width: 440px; max-height: 92vh; overflow-y: auto; }
+  .smb img { width: 100%; display: block; border-radius: 12px; border: 1px solid var(--line); }
+  .smb .sbtn { display: flex; gap: 8px; margin-top: 10px; }
+  .smb .sbtn button { flex: 1; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .tabs, .topbar, .noprint, #tab-trip, .intro, button { display: none !important; }
+    .panel { display: block !important; }
+    .card { box-shadow: none; break-inside: avoid; }
+    .stack thead { display: table-header-group; }
+  }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="pencil" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="2" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.1" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <symbol id="i-overview" viewBox="0 0 24 24">
+      <g filter="url(#pencil)">
+        <path d="M3.5 3.4 L3.3 20.8 M3.2 20.6 L20.9 20.3"/>
+        <path d="M3.9 3.8 L3.7 20.4 M3.6 20.9 L20.4 20.8" opacity=".45"/>
+        <path d="M6.2 20.4 L6.4 13.1 L9.1 13.3 L8.9 20.5"/>
+        <path d="M11 20.4 L11.2 8.6 L14 8.4 L13.8 20.3"/>
+        <path d="M15.9 20.3 L16.1 11.2 L18.8 11.4 L18.7 20.4"/>
+        <path d="M11.4 12.2 L13.7 9.9 M11.4 15.4 L13.7 13.1 M11.4 18.6 L13.7 16.3 M6.6 17 L8.8 14.8 M16.3 15 L18.5 12.8 M16.3 18.3 L18.5 16.1" opacity=".55"/>
+      </g>
+    </symbol>
+    <symbol id="i-add" viewBox="0 0 24 24">
+      <g filter="url(#pencil)">
+        <path d="M5.2 15.6 L15.6 5.1 L18.9 8.4 L8.5 18.8 Z"/>
+        <path d="M5.6 15.9 L15.8 5.6 M8.9 18.5 L19.1 8.2" opacity=".45"/>
+        <path d="M5.2 15.6 L3.6 20.4 L8.5 18.8"/>
+        <path d="M14 6.7 L17.3 10"/>
+        <path d="M3.6 20.4 L4.3 18.3 L5.8 19.7 Z" fill="currentColor"/>
+        <path d="M7.3 14.9 L9.3 16.9 M9.6 12.6 L11.6 14.6 M11.9 10.3 L13.9 12.3" opacity=".5"/>
+        <path d="M12 21.2 C13.4 20.4 14.6 21.6 16 20.8 C17.3 20.1 18.4 21.3 20.4 20.7" opacity=".6"/>
+      </g>
+    </symbol>
+    <symbol id="i-list" viewBox="0 0 24 24">
+      <g filter="url(#pencil)">
+        <path d="M5.5 3.2 L18.8 3.5 L18.6 20.9 L5.3 20.7 Z"/>
+        <path d="M5.9 3.6 L19.2 3.3 L19 20.6" opacity=".45"/>
+        <path d="M3.4 6.6 L7 6.5 M3.3 10.5 L6.9 10.6 M3.4 14.5 L7 14.4 M3.3 18.4 L6.9 18.5"/>
+        <path d="M9.4 7.6 L16 7.5 M9.3 11.2 L16.2 11.3 M9.4 14.8 L14.2 14.7 M9.3 18.2 L12.8 18.1" opacity=".7"/>
+      </g>
+    </symbol>
+    <symbol id="i-split" viewBox="0 0 24 24">
+      <g filter="url(#pencil)">
+        <path d="M8.9 4.4 C10.9 4.3 12.1 5.8 12 7.6 C11.9 9.5 10.5 10.7 8.8 10.6 C7 10.5 5.8 9.1 5.9 7.4 C6 5.7 7.2 4.4 8.9 4.4 Z"/>
+        <path d="M3.4 19.8 C3.6 15.6 6 13.2 9 13.2 C12 13.2 14.3 15.6 14.5 19.8"/>
+        <path d="M3.8 20.3 C4.1 16.3 6.2 13.8 9.1 13.7" opacity=".45"/>
+        <path d="M16.4 6.6 C17.9 6.6 18.9 7.7 18.8 9.1 C18.8 10.5 17.7 11.5 16.3 11.4 C14.9 11.3 14 10.3 14.1 8.9 C14.2 7.6 15.2 6.6 16.4 6.6 Z"/>
+        <path d="M15.6 13.6 C18.5 13.3 20.5 15.4 20.7 19.4"/>
+        <path d="M6.7 6.2 L8.2 4.8 M6.4 8.4 L9.6 5.2" opacity=".4"/>
+      </g>
+    </symbol>
+    <symbol id="i-fx" viewBox="0 0 24 24">
+      <g filter="url(#pencil)">
+        <path d="M8.6 9.2 C11.6 9.1 14 11.5 13.9 14.6 C13.8 17.6 11.4 19.9 8.4 19.8 C5.5 19.7 3.2 17.3 3.3 14.4 C3.4 11.5 5.7 9.2 8.6 9.2 Z"/>
+        <path d="M8.9 9.6 C11.7 9.8 13.6 12.1 13.4 14.9" opacity=".45"/>
+        <path d="M8.6 11.9 C10.3 11.9 11.5 13.2 11.4 14.7 C11.4 16.2 10.1 17.4 8.5 17.3 C7 17.2 5.8 16 5.9 14.5 C6 13 7.1 11.9 8.6 11.9 Z" opacity=".7"/>
+        <path d="M13.2 4.2 C16.4 3.6 19.6 5.6 20.2 8.8"/>
+        <path d="M18.6 7.6 L20.2 9.1 L21.6 7.3"/>
+        <path d="M16.6 13.4 C18.5 13.2 20.1 12.1 20.7 10.8" opacity=".6"/>
+      </g>
+    </symbol>
+    <symbol id="i-trip" viewBox="0 0 24 24">
+      <g filter="url(#pencil)">
+        <path d="M4.6 8.1 L19.5 8 C20.2 8 20.7 8.5 20.7 9.2 L20.8 18.8 C20.8 19.5 20.3 20 19.6 20 L4.5 20.1 C3.8 20.1 3.3 19.6 3.3 18.9 L3.4 9.3 C3.4 8.6 3.9 8.1 4.6 8.1 Z"/>
+        <path d="M3.8 9 L3.7 19.3 M4.4 20.5 L19.9 20.4" opacity=".45"/>
+        <path d="M9 8 L9.1 5.1 C9.1 4.4 9.6 4 10.2 4 L13.9 4.1 C14.5 4.1 15 4.5 15 5.2 L14.9 8"/>
+        <path d="M7.6 8.2 L7.5 20 M16.5 8.1 L16.6 20"/>
+        <path d="M17.6 11.5 L19.8 9.3 M17.6 14.7 L19.8 12.5 M17.6 17.9 L19.8 15.7" opacity=".5"/>
+      </g>
+    </symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24">
+      <g filter="url(#pencil)">
+        <path d="M12 21 C8 16.5 5.8 13.4 5.9 10 C6 6.6 8.7 4 12.1 4 C15.4 4.1 18.1 6.7 18 10 C17.9 13.5 15.8 16.6 12 21 Z"/>
+        <path d="M12.4 20.4 C15.6 16.5 17.5 13.5 17.5 10.2" opacity=".45"/>
+        <path d="M12 7.8 C13.3 7.8 14.2 8.8 14.1 10 C14.1 11.2 13.1 12.1 11.9 12 C10.8 12 9.9 11 10 9.9 C10 8.7 10.9 7.8 12 7.8 Z"/>
+      </g>
+    </symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24">
+      <g filter="url(#pencil)">
+        <path d="M9 16.8 C9 14.8 6.4 13.6 6.6 10 C6.8 6.7 9.2 4.4 12.1 4.4 C15 4.5 17.4 6.8 17.4 10 C17.4 13.5 15 14.8 15 16.8 Z"/>
+        <path d="M9.3 19 L14.7 18.9 M10.2 21.1 L13.8 21"/>
+        <path d="M12 1.6 L12 2.6 M4.2 4.4 L5 5.2 M19.8 4.4 L19 5.2 M2.6 10.6 L3.6 10.6 M20.4 10.6 L21.4 10.6" opacity=".7"/>
+        <path d="M10.6 14.6 L11.4 9.6 L12.6 11.4 L13.6 9.6" opacity=".6"/>
+      </g>
+    </symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24">
+      <g filter="url(#pencil)">
+        <path d="M8 3.2 L16.1 3.3 C16.8 3.3 17.2 3.8 17.2 4.4 L17.1 19.8 C17.1 20.4 16.6 20.9 16 20.9 L7.9 20.8 C7.3 20.8 6.8 20.3 6.8 19.7 L6.9 4.3 C6.9 3.7 7.4 3.2 8 3.2 Z"/>
+        <path d="M7.3 4.6 L7.2 19.9" opacity=".45"/>
+        <path d="M10.6 18.4 L13.4 18.4 M10.8 5.4 L13.2 5.4"/>
+        <path d="M9.4 12.2 C9.4 10.4 12 9.9 12 11.6 C12 9.9 14.6 10.4 14.6 12.2 C14.6 13.6 12 15.2 12 15.2 C12 15.2 9.4 13.6 9.4 12.2 Z" opacity=".75"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+<div class="wrap">
+
+  <!-- 頁首：目前旅行 -->
+  <header class="hero">
+    <div class="topbar">
+    <label for="tripSelect">目前旅行</label>
+    <select id="tripSelect"></select>
+  </div>
+  <p class="kicker">TRAVEL BUDGET JOURNAL</p>
+  <h1 id="title">旅遊預算與花費管理</h1>
+  <div class="trip-meta" id="tripMeta"></div>
+    <svg class="scene" viewBox="0 0 400 110" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="318" cy="46" r="15" stroke="#C9A98A" stroke-width="1"/>
+        <path d="M0 92 C40 70 62 64 92 78 C118 90 132 58 166 50 C196 43 214 74 240 80 C268 86 286 66 316 70 C346 74 370 86 400 80" stroke="#B8C7D2" stroke-width="1.1"/>
+        <path d="M0 100 C52 88 96 96 140 92 C190 88 226 98 276 94 C326 90 362 98 400 94" stroke="#C9B8A2" stroke-width="1"/>
+        <path d="M150 56 L166 50 L178 58" stroke="#B8C7D2" stroke-width="1"/>
+        <path d="M30 40 C90 18 170 14 240 26" stroke="#9B7B60" stroke-width=".9" stroke-dasharray="2 5"/>
+        <path d="M240 26 L252 24 L247 29 Z M246 25.5 L243 20" stroke="#9B7B60" stroke-width=".9"/>
+        <path d="M96 52 q4 -4 8 0 q4 -4 8 0 M120 44 q3 -3 6 0 q3 -3 6 0" stroke="#A9978A" stroke-width=".8"/>
+      </g>
+    </svg>
+  </header>
+
+  <!-- 分頁 -->
+  <nav class="tabs" id="tabs">
+    <button class="tab" data-tab="overview"><svg class="ic" aria-hidden="true"><use href="#i-overview"/></svg>總覽</button>
+    <button class="tab" data-tab="trip"><svg class="ic" aria-hidden="true"><use href="#i-trip"/></svg>旅行</button>
+    <button class="tab" data-tab="add"><svg class="ic" aria-hidden="true"><use href="#i-add"/></svg>記帳</button>
+    <button class="tab" data-tab="split"><svg class="ic" aria-hidden="true"><use href="#i-split"/></svg>分帳</button>
+    <button class="tab" data-tab="fx"><svg class="ic" aria-hidden="true"><use href="#i-fx"/></svg>外幣</button>
+  </nav>
+
+  <!-- ========== 總覽 ========== -->
+  <section class="panel" id="tab-overview">
+    <div class="intro">
+      <p class="lead">出發前先抓好預算，旅途中記下每一筆，回頭就知道花到哪裡、還剩多少。</p>
+      <p class="sub">少一點邊走邊算，多一點安心享受旅行。</p>
+      <p class="concept">旅途中花費比較零散，先依照機票、住宿、交通、餐飲分類，就能更清楚知道錢花在哪裡。</p>
+    </div>
+
+    <div class="card" id="todayCard">
+      <h2 data-kicker="TODAY">今天還可以花</h2>
+      <div class="today-v" id="todayV"></div>
+      <div class="today-s" id="todayS"></div>
+      <p class="hint" id="todayHint"></p>
+    </div>
+
+    <div class="card noprint" id="sumCard" style="display:none">
+      <h2 data-kicker="TRIP SUMMARY">旅行總結</h2>
+      <p class="hint" id="sumCardHint" style="margin-top:0"></p>
+      <button type="button" id="sumBtn">看這趟旅行的總結</button>
+    </div>
+
+    <div class="card">
+      <h2 data-kicker="NOTES">提醒</h2>
+      <ul class="alerts" id="alerts"></ul>
+    </div>
+
+    <div class="card">
+      <h2 data-kicker="SUMMARY">花費統計</h2>
+      <div class="dispcur noprint">
+        <label for="dispCur">同時顯示</label>
+        <select id="dispCur"></select>
+      </div>
+      <div class="summary">
+        <div class="box"><div class="t">原始總預算</div><div class="v" id="sumBudget">NT$ 0</div><div class="sub2" id="sumBudget2"></div></div>
+        <div class="box"><div class="t">目前累積花費</div><div class="v" id="sumSpent">NT$ 0</div><div class="sub2" id="sumSpent2"></div></div>
+        <div class="box"><div class="t">剩餘預算</div><div class="v" id="sumLeft">NT$ 0</div><div class="sub2" id="sumLeft2"></div><div class="t neg" id="sumLeftNote"></div></div>
+      </div>
+      <p class="hint" style="margin:-4px 0 14px">代購／伴手禮不算入旅遊花費；「行前已付」與「旅途花費」分開列在下方。</p>
+      <div class="minis" id="minis"></div>
+      <table class="stack">
+        <thead>
+          <tr><th>類別</th><th class="num">預算</th><th class="num">實際花費</th><th class="num">剩餘</th></tr>
+        </thead>
+        <tbody id="catTable"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2 data-kicker="DAILY SPENDING">每日花費</h2>
+      <div class="daybars" id="dayBars"></div>
+      <div class="facts" id="facts"></div>
+      <div class="subhead">花費最高的 5 筆</div>
+      <ol class="ranklist" id="topList"></ol>
+    </div>
+
+    <div class="card" id="proxyCard" style="display:none">
+      <h2 data-kicker="FOR OTHERS">代購／伴手禮</h2>
+      <p class="hint" style="margin:0 0 10px">幫別人買的東西不算入你的旅遊花費。收到錢後按「已收款」。</p>
+      <p class="filter-sum" id="proxySum"></p>
+      <table class="stack">
+        <thead><tr><th>項目</th><th>幫誰買</th><th class="num">金額</th><th class="num">收款</th></tr></thead>
+        <tbody id="proxyList"></tbody>
+      </table>
+    </div>
+
+    <div class="note"><svg class="ic-s" aria-hidden="true"><use href="#i-phone"/></svg>資料只會儲存在「目前這台裝置的瀏覽器」中。若清除瀏覽資料、使用無痕模式，或更換裝置／瀏覽器，資料可能無法保留。建議不定時到「旅行」分頁用「匯出備份」另存一份。</div>
+  </section>
+
+  <!-- ========== 記帳 ========== -->
+  <section class="panel" id="tab-add">
+    <div class="card noprint" id="expFormCard">
+      <h2 data-kicker="NEW ENTRY" id="formTitle">新增一筆花費</h2>
+      <p class="step">每次有新的支出，就在這裡新增一筆，系統會自動更新花費統計。</p>
+      <div class="qin">
+        <label for="quickIn">快速輸入</label>
+        <div class="qrow"><input id="quickIn" type="text" autocomplete="off" placeholder="例如：拉麵 1200 日圓 刷卡"><button type="button" class="small secondary" id="quickGo">帶入</button></div>
+        <p class="hint">可以用手機鍵盤上的 🎤 麥克風直接說，再按「帶入」，下面的欄位會自動填好，確認後按「新增花費」。</p>
+        <p class="hint" id="quickMsg" aria-live="polite"></p>
+      </div>
+      <p class="hint" style="margin:0 0 12px"><svg class="ic-s" aria-hidden="true"><use href="#i-bulb"/></svg>不用把每筆花費拆得很細，先選擇最接近的類別，掌握各項預算與實際支出的差距就好。</p>
+      <div class="grid">
+        <div>
+          <label for="expDate">日期</label>
+          <input id="expDate" type="date">
+        </div>
+        <div>
+          <label for="expCat">類別</label>
+          <select id="expCat"></select>
+        </div>
+        <div>
+          <label for="expItem">花費項目</label>
+          <input id="expItem" type="text" list="itemList" placeholder="例如：機場快線">
+          <datalist id="itemList"></datalist>
+        </div>
+        <div>
+          <label for="expCurrency">幣別</label>
+          <select id="expCurrency"></select>
+        </div>
+        <div>
+          <label for="expPay">付款方式</label>
+          <select id="expPay"></select>
+        </div>
+        <div>
+          <label for="expAmount" id="expAmountLabel">金額（新台幣）</label>
+          <input id="expAmount" type="number" min="0" step="any" inputmode="decimal" placeholder="例如：350">
+        </div>
+        <div id="rateField" style="display:none">
+          <label for="expRate" id="expRateLabel">匯率（換算新台幣）</label>
+          <input id="expRate" type="number" min="0" step="any" inputmode="decimal" placeholder="例如：0.0246">
+          <div class="liverow"><button type="button" class="linkbtn" id="liveRate">查詢今天的參考匯率</button><span class="hint" id="liveMsg" style="margin:0" aria-live="polite"></span></div>
+        </div>
+      </div>
+      <div class="quick" id="quickAmts"></div>
+      <div class="hint" id="convertHint"></div>
+
+      <div id="splitBlock" style="display:none">
+        <div class="field" style="margin-top:14px; max-width:260px">
+          <label for="expPayer">付款人</label>
+          <select id="expPayer"></select>
+        </div>
+        <div>
+          <label>分攤的人與份數</label>
+          <div class="checks" id="expSplit"></div>
+          <p class="hint" style="margin-top:0">勾選要分攤的人；預設平均分攤，要按比例就調整份數（例如 2 和 1，或有人只吃一半填 0.5）。</p>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:14px; margin-bottom:0">
+        <label for="expNote">備註（選填）</label>
+        <input id="expNote" type="text" placeholder="例如：含退稅、朋友請客">
+      </div>
+
+      <details class="more" id="moreFields">
+        <summary>更多欄位（選填）：時間、地點、必要性、固定支出、分期、行前已付、代購</summary>
+        <div class="grid">
+          <div>
+            <label for="expTime">時間</label>
+            <input id="expTime" type="time">
+          </div>
+          <div>
+            <label for="expPlace">消費地點</label>
+            <input id="expPlace" type="text" placeholder="例如：弘大">
+          </div>
+          <div>
+            <label for="expNeed">必要性</label>
+            <select id="expNeed">
+              <option value="">不標記</option>
+              <option value="必要">必要支出</option>
+              <option value="非必要">非必要支出</option>
+            </select>
+          </div>
+          <div>
+            <label for="expInst">分期期數</label>
+            <input id="expInst" type="number" min="2" step="1" inputmode="numeric" placeholder="不分期">
+          </div>
+          <div>
+            <label>支出性質</label>
+            <label class="checkline"><input type="checkbox" id="expFixed">固定支出</label>
+          </div>
+          <div>
+            <label>行前／旅途</label>
+            <label class="checkline"><input type="checkbox" id="expPre">行前已付</label>
+          </div>
+          <div>
+            <label>代購／伴手禮</label>
+            <label class="checkline"><input type="checkbox" id="expProxy">幫別人買</label>
+          </div>
+        </div>
+        <div class="grid" id="proxyBlock" style="display:none; margin-top:10px">
+          <div>
+            <label for="expProxyFor">幫誰買</label>
+            <input id="expProxyFor" type="text" placeholder="例如：媽媽、同事">
+          </div>
+          <div>
+            <label>收款狀態</label>
+            <label class="checkline"><input type="checkbox" id="expProxyGot">已收到錢</label>
+          </div>
+        </div>
+        <p class="hint" id="instHint"></p>
+        <p class="hint">行前已付：出發前就付掉的錢（機票、住宿、網卡、門票），會和旅途花費分開統計；日期早於出發日時會自動勾選。代購：不算入你的旅遊花費，可記錄幫誰買、收款了沒。<br>固定支出：出發前就確定的費用，例如機票、住宿、租車。分期付款會記下期數與每期金額，預算統計仍以全額計算。<br>付款方式選「現金」的外幣花費，會自動從「外幣」分頁的剩餘現金中扣除。</p>
+      </details>
+
+      <details class="more" id="receiptBox">
+        <summary>收據細項拆帳（同一張收據拆成多筆）</summary>
+        <p class="hint" style="margin-top:0">例如藥妝店一張收據：幾樣大家分攤、幾樣是某人自己買的。填了細項後會拆成多筆紀錄，上面的「金額」可以不填（日期、類別、幣別、付款方式與付款人沿用上方）。</p>
+        <div id="receiptRows"></div>
+        <div class="actions"><button type="button" class="secondary small" id="addRow">＋ 新增細項</button></div>
+        <p class="hint" id="receiptSum"></p>
+      </details>
+
+      <div class="hint warn" id="formError"></div>
+      <div class="actions" style="margin-top:12px">
+        <button id="submitExp">新增花費</button>
+        <button id="cancelEdit" class="secondary" style="display:none">取消</button>
+        <span class="saved" id="expSavedMsg"></span>
+      </div>
+    </div>
+
+    <details class="card noprint filtercard" id="filterCard">
+      <summary><h2>搜尋與篩選</h2></summary>
+      <div class="grid">
+        <div>
+          <label for="fKw">關鍵字</label>
+          <input id="fKw" type="search" placeholder="項目、地點、備註">
+        </div>
+        <div>
+          <label for="fCat">類別</label>
+          <select id="fCat"></select>
+        </div>
+        <div>
+          <label for="fPay">付款方式</label>
+          <select id="fPay"></select>
+        </div>
+        <div>
+          <label for="fFrom">開始日期</label>
+          <input id="fFrom" type="date">
+        </div>
+        <div>
+          <label for="fTo">結束日期</label>
+          <input id="fTo" type="date">
+        </div>
+        <div>
+          <label for="fMin">最低金額（台幣）</label>
+          <input id="fMin" type="number" min="0" inputmode="numeric">
+        </div>
+        <div>
+          <label for="fMax">最高金額（台幣）</label>
+          <input id="fMax" type="number" min="0" inputmode="numeric">
+        </div>
+        <div>
+          <label for="fTag">標記</label>
+          <select id="fTag">
+            <option value="">全部</option>
+            <option value="fixed">固定支出</option>
+            <option value="var">非固定支出</option>
+            <option value="inst">分期付款</option>
+            <option value="pre">行前已付</option>
+            <option value="trip">旅途花費</option>
+            <option value="proxy">代購／伴手禮</option>
+            <option value="pool">公費支付</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions" style="margin-top:12px">
+        <button id="clearFilter" class="secondary small">清除篩選</button>
+      </div>
+    </details>
+
+    <div class="card">
+      <h2 data-kicker="RECORDS">所有花費紀錄 <span class="saved" id="listSavedMsg"></span></h2>
+      <p class="filter-sum" id="filterSum"></p>
+      <div class="actions noprint" style="margin:0 0 12px">
+        <button id="batchToggle" class="secondary small">批次修改／刪除</button>
+      </div>
+      <div class="batchbar noprint" id="batchBar" style="display:none">
+        <p class="filter-sum" id="batchCount" style="font-weight:600">已選 0 筆</p>
+        <div class="actions">
+          <button id="batchAll" class="secondary small">全選目前列表</button>
+          <button id="batchNone" class="secondary small">取消選取</button>
+        </div>
+        <div class="grid" style="margin-top:12px">
+          <div><label for="bCat">類別</label><select id="bCat"></select></div>
+          <div><label for="bDate">日期</label><input id="bDate" type="date"></div>
+          <div><label for="bPay">付款方式</label><select id="bPay"></select></div>
+          <div id="bPayerWrap"><label for="bPayer">付款人</label><select id="bPayer"></select></div>
+          <div><label for="bNeed">必要性</label>
+            <select id="bNeed"><option value="">不變更</option><option value="必要">必要支出</option><option value="非必要">非必要支出</option><option value="__clear">清除標記</option></select></div>
+          <div><label for="bFixed">固定支出</label>
+            <select id="bFixed"><option value="">不變更</option><option value="1">標記為固定支出</option><option value="0">取消標記</option></select></div>
+        </div>
+        <p class="hint">選「不變更」或留白的欄位會保持原樣。</p>
+        <div class="actions" style="margin-top:10px">
+          <button id="batchApply">套用到已選紀錄</button>
+          <button id="batchDel" class="danger">刪除已選紀錄</button>
+          <button id="batchDone" class="secondary">完成</button>
+        </div>
+      </div>
+      <table id="expenseTable" class="stack">
+        <thead>
+          <tr><th>日期</th><th>項目</th><th>類別</th><th class="num">金額</th><th class="num">操作</th></tr>
+        </thead>
+        <tbody id="expList"></tbody>
+      </table>
+      <div class="actions noprint" style="margin-top:14px">
+        <button id="csvBtn" class="secondary small">匯出 CSV（可用 Excel 開啟）</button>
+        <button id="printBtn" class="secondary small">列印／存成 PDF</button>
+      </div>
+      <p class="hint noprint">列印會包含總覽、目前篩選的明細、分帳與外幣統計；在列印視窗選「另存為 PDF」即可存成 PDF。</p>
+    </div>
+  </section>
+
+
+  <!-- ========== 分帳 ========== -->
+  <section class="panel" id="tab-split">
+    <div class="card" id="splitEmpty">
+      <h2 data-kicker="SETTLEMENT">分帳結算</h2>
+      <p class="hint" style="margin:0">到「旅行」分頁填入兩位以上旅伴，就能記錄誰付錢、誰分攤，並自動算出誰該給誰多少。</p>
+    </div>
+    <div id="settleCard" style="display:none">
+      <div class="card">
+        <h2 data-kicker="SHARED WALLET">公費錢包 <span class="saved" id="poolSavedMsg"></span></h2>
+        <p class="hint" style="margin:0 0 12px">大家先各交一筆公費，吃飯、搭車時付款人選「公費」就會從這裡扣。拿公費去換外幣時，在「外幣」分頁勾選「用公費換匯」。</p>
+        <div class="poolbal" id="poolBal"></div>
+        <p class="hint" id="poolHint"></p>
+        <div class="subhead">收公費</div>
+        <div class="grid">
+          <div><label for="cMember">誰交的</label><select id="cMember"></select></div>
+          <div><label for="cCur">幣別</label><select id="cCur"></select></div>
+          <div><label for="cAmount" id="cAmountLabel">金額（新台幣）</label><input id="cAmount" type="number" min="0" step="any" inputmode="decimal" placeholder="例如：10000"></div>
+          <div id="cRateWrap" style="display:none"><label for="cRate">匯率（1 外幣 = ? 台幣）</label><input id="cRate" type="number" min="0" step="any" inputmode="decimal"></div>
+          <div><label for="cDate">日期</label><input id="cDate" type="date"></div>
+        </div>
+        <div class="hint warn" id="cError"></div>
+        <div class="actions" style="margin-top:10px">
+          <button id="cSubmit" class="small">記錄公費</button>
+          <button id="cAll" class="secondary small">每人各交相同金額</button>
+        </div>
+        <div class="grid" style="margin-top:14px">
+          <div><label for="poolAlert">公費低於多少提醒補繳（台幣，選填）</label><input id="poolAlert" type="number" min="0" step="1" inputmode="numeric" placeholder="例如：2000"></div>
+        </div>
+        <table class="stack" style="margin-top:14px">
+          <thead><tr><th>日期</th><th>誰交的</th><th class="num">金額</th><th class="num">操作</th></tr></thead>
+          <tbody id="cList"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2 data-kicker="SETTLEMENT">分帳結算</h2>
+        <p class="hint" style="margin:0 0 12px">依每筆花費的付款人、分攤的人與份數自動計算；交的公費算在「已付」，公費剩下的錢會按出資比例退回。已記錄的轉帳會扣除，代購不列入。金額以新台幣顯示。</p>
+        <table id="settleTableWrap" class="stack">
+          <thead>
+            <tr><th>旅伴</th><th class="num">已付</th><th class="num">個人花費</th><th class="num">結果</th></tr>
+          </thead>
+          <tbody id="settleTable"></tbody>
+        </table>
+        <div class="subhead">怎麼轉帳就能結清（已自動簡化成最少的轉帳次數）</div>
+        <ul class="moves" id="settleMoves"></ul>
+        <p class="hint warn" id="settleHint"></p>
+        <p class="hint" id="groupHint"></p>
+      </div>
+      <div class="card">
+        <h2 data-kicker="HISTORY">結算紀錄 <span class="saved" id="settleSavedMsg"></span></h2>
+        <p class="hint" style="margin:0 0 10px">按上方的「標記已轉帳」會記錄在這裡；記錯了可以刪除。</p>
+        <table class="stack">
+          <thead><tr><th>日期</th><th>轉帳</th><th class="num">金額</th><th class="num">操作</th></tr></thead>
+          <tbody id="settleRecords"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 外幣 ========== -->
+  <section class="panel" id="tab-fx">
+    <div class="card noprint">
+      <h2 data-kicker="EXCHANGE">新增換匯紀錄</h2>
+      <p class="hint" style="margin:0 0 12px">出國前或在當地換現金時記下來，就能算出實際換匯匯率（含手續費），以及手上還剩多少外幣現金。換匯不算花費，不會影響預算統計。</p>
+      <div class="grid">
+        <div>
+          <label for="fxDate">日期</label>
+          <input id="fxDate" type="date">
+        </div>
+        <div>
+          <label for="fxCur">幣別</label>
+          <select id="fxCur"></select>
+        </div>
+        <div>
+          <label for="fxForeign" id="fxForeignLabel">換到的外幣</label>
+          <input id="fxForeign" type="number" min="0" step="any" inputmode="decimal" placeholder="例如：200000">
+        </div>
+        <div>
+          <label for="fxTwd">付出的新台幣</label>
+          <input id="fxTwd" type="number" min="0" step="any" inputmode="decimal" placeholder="例如：4900">
+        </div>
+        <div>
+          <label for="fxFee">手續費（新台幣，選填）</label>
+          <input id="fxFee" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+        </div>
+        <div>
+          <label for="fxNote">備註（選填）</label>
+          <input id="fxNote" type="text" placeholder="例如：桃園機場臺銀">
+        </div>
+        <div id="fxPoolWrap" style="display:none">
+          <label>錢從哪裡來</label>
+          <label class="checkline"><input type="checkbox" id="fxPool">用公費換匯</label>
+        </div>
+      </div>
+      <div class="hint" id="fxHint"></div>
+      <div class="hint warn" id="fxError"></div>
+      <div class="actions" style="margin-top:12px">
+        <button id="fxSubmit">新增換匯紀錄</button>
+        <span class="saved" id="fxSavedMsg"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-kicker="CURRENCIES">各幣別統計（個人）</h2>
+      <table class="stack">
+        <thead><tr><th>幣別</th><th class="num">花費（外幣）</th><th class="num">花費（台幣）</th><th class="num">換匯平均匯率</th><th class="num">剩餘現金</th></tr></thead>
+        <tbody id="curTable"></tbody>
+      </table>
+      <p class="hint" id="fxSumHint"></p>
+    </div>
+
+    <div class="card">
+      <h2 data-kicker="EXCHANGE LOG">換匯紀錄</h2>
+      <table class="stack">
+        <thead><tr><th>日期</th><th>換匯</th><th class="num">付出台幣</th><th class="num">實際匯率</th><th class="num">操作</th></tr></thead>
+        <tbody id="fxList"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========== 旅行 ========== -->
+  <section class="panel" id="tab-trip">
+    <div class="card">
+      <h2 data-kicker="TRIP PLAN">旅遊預算設定</h2>
+      <p class="step">第一步：先設定這趟旅行的總預算與各項預算，完成後按下儲存，再開始記錄旅途中的花費。</p>
+      <div class="grid">
+        <div>
+          <label for="tripName">旅遊名稱（選填）</label>
+          <input id="tripName" type="text" placeholder="例如：首爾冬日五天">
+        </div>
+        <div>
+          <label for="tDest">目的地（選填）</label>
+          <input id="tDest" type="text" placeholder="例如：韓國首爾">
+        </div>
+        <div>
+          <label for="tStart">出發日期</label>
+          <input id="tStart" type="date">
+        </div>
+        <div>
+          <label for="tEnd">回程日期</label>
+          <input id="tEnd" type="date">
+        </div>
+      </div>
+      <p class="hint" id="tDaysHint"></p>
+
+      <div class="grid" style="margin-top:14px">
+        <div>
+          <label for="totalBudget">旅遊總預算（新台幣）</label>
+          <input id="totalBudget" type="number" min="0" step="1" inputmode="numeric" placeholder="例如：40000">
+        </div>
+        <div>
+          <label for="tTravelers">旅遊人數</label>
+          <input id="tTravelers" type="number" min="1" step="1" inputmode="numeric" placeholder="1">
+        </div>
+        <div>
+          <label for="tReserve">緊急備用金（選填）</label>
+          <input id="tReserve" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+        </div>
+      </div>
+      <p class="hint" id="perPersonHint"></p>
+
+      <label style="margin-top:16px">各類別預算（新台幣）</label>
+      <p class="hint" style="margin:0 0 8px">可依照你的需求分配，不需要每個類別都填寫。</p>
+      <div class="grid" id="catBudgetInputs"></div>
+      <div class="hint" id="budgetHint"></div>
+
+      <div class="grid" style="margin-top:16px">
+        <div>
+          <label for="tDaily">每日花費上限（選填）</label>
+          <input id="tDaily" type="number" min="0" step="1" inputmode="numeric">
+        </div>
+        <div>
+          <label for="tAlert">預算提醒門檻（%）</label>
+          <input id="tAlert" type="number" min="1" max="100" step="1" inputmode="numeric" placeholder="80">
+        </div>
+      </div>
+      <p class="hint">每日上限留白時，會用「旅途現場預算 ÷ 旅遊天數」自動計算，旅途中則改看總覽的「今天還可以花」動態額度。預算使用到門檻（例如 80%）時，總覽會出現提醒。</p>
+
+      <div class="grid" style="margin-top:16px">
+        <div>
+          <label for="tCardFee">海外刷卡手續費（%）</label>
+          <input id="tCardFee" type="number" min="0" step="0.01" inputmode="decimal" placeholder="1.5">
+        </div>
+        <div>
+          <label for="tCashback">信用卡回饋（%，選填）</label>
+          <input id="tCashback" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0">
+        </div>
+        <div>
+          <label for="tTripBudget">旅途現場預算（選填）</label>
+          <input id="tTripBudget" type="number" min="0" step="1" inputmode="numeric">
+        </div>
+      </div>
+      <p class="hint">外幣刷卡時，台幣金額 = 外幣 × 匯率 × (1 + 手續費 − 回饋)。旅途現場預算是吃喝、購物、交通等現場花費的預算，用來計算「今天還可以花多少」；留白時會用「總預算 − 備用金 − 行前已付」。</p>
+
+      <div class="field" style="margin-top:16px">
+        <label>預設匯率（選填）</label>
+        <div class="grid">
+          <div>
+            <label for="tRateCur" style="font-weight:400">幣別</label>
+            <select id="tRateCur"></select>
+          </div>
+          <div>
+            <label for="tRateVal" id="tRateLabel" style="font-weight:400">1 日圓 = ? 新台幣</label>
+            <input id="tRateVal" type="number" min="0" step="any" inputmode="decimal" placeholder="例如：0.21">
+          </div>
+        </div>
+        <p class="hint" id="tRateHint"></p>
+      </div>
+
+      <div class="field" style="margin-top:16px">
+        <label for="members">旅伴名單（選填，需要分帳時再填）</label>
+        <input id="members" type="text" placeholder="例如：我、小美、阿明">
+        <p class="hint" style="margin-top:6px">用頓號或逗號分隔名字。填寫後，記帳時可以選擇誰付錢、誰分攤；一個人旅行可以留白。</p>
+      </div>
+      <div class="field">
+        <label for="tNote">旅行備註（選填）</label>
+        <textarea id="tNote" placeholder="例如：住宿已付訂金、記得退稅"></textarea>
+      </div>
+      <div class="hint warn" id="tripError"></div>
+      <div class="actions" style="margin-top:12px">
+        <button id="saveBudget">儲存設定</button>
+        <span class="saved" id="savedMsg"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-kicker="MY JOURNEYS">我的旅行</h2>
+      <p class="hint" style="margin:0 0 12px">可以建立多趟旅行並隨時切換，也能比較不同旅行的花費。</p>
+      <table class="stack">
+        <thead><tr><th>旅行</th><th>日期</th><th class="num">預算</th><th class="num">花費</th><th class="num">操作</th></tr></thead>
+        <tbody id="tripList"></tbody>
+      </table>
+      <div class="actions" style="margin-top:14px">
+        <button id="newTripBtn" class="small">＋ 新增旅行</button>
+        <button id="copyTripBtn" class="secondary small">複製目前預算設定建立新旅行</button>
+        <span class="saved" id="tripSavedMsg"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-kicker="BACKUP">資料備份</h2>
+      <p class="hint" style="margin:0 0 12px">匯出會下載一個備份檔（.json），包含所有旅行。換裝置或清除瀏覽資料後，可以用「匯入備份」把資料放回來。</p>
+      <div class="actions">
+        <button id="exportBtn">匯出備份</button>
+        <button id="importBtn" class="secondary">匯入備份</button>
+        <input id="importFile" type="file" accept=".json,application/json" style="display:none">
+        <span class="saved" id="backupMsg"></span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="smk" id="sumModal" hidden>
+  <div class="smb" role="dialog" aria-modal="true" aria-labelledby="sumTitle">
+    <h2 id="sumTitle" style="margin:0 0 10px;font-size:1.1rem">旅行總結</h2>
+    <img id="sumImg" alt="">
+    <p class="hint" id="sumSaveHint">手機：長按圖片就能存到相簿或分享到 IG。電腦：按「下載圖片」。</p>
+    <div class="sbtn"><button type="button" id="sumDl">下載圖片</button><button type="button" class="secondary" id="sumClose">關閉</button></div>
+  </div>
+</div>
+<script>
+(function () {
+  var KEY2 = 'travelBudgetTool_v2';
+  var KEY1 = 'travelBudgetTool_v1';
+  var CATEGORIES = ['機票', '租車', '住宿', '交通', 'ETC／高速公路費', '油錢', '餐飲', '購物', '景點門票', '其他'];
+  var PAYS = ['現金', '信用卡', '電子支付', '其他'];
+  var CURRENCIES = [
+    ['TWD', '新台幣'], ['JPY', '日圓'], ['KRW', '韓元'], ['USD', '美元'], ['EUR', '歐元'],
+    ['CNY', '人民幣'], ['HKD', '港幣'], ['THB', '泰銖'], ['SGD', '新加坡幣'], ['GBP', '英鎊'], ['VND', '越南盾']
+  ];
+  function curName(code) {
+    for (var i = 0; i < CURRENCIES.length; i++) if (CURRENCIES[i][0] === code) return CURRENCIES[i][1];
+    return code;
+  }
+  function validCur(c) { return curName(c) !== c; }
+
+  var PIN = '<svg class="ic-s" aria-hidden="true"><use href="#i-pin"/></svg>';
+  var db = { version: 2, currentId: null, trips: [] };
+  var storageOK = true;
+  var editingId = null;
+  var currentTab = 'overview';
+  var filters = { kw: '', cat: '', pay: '', from: '', to: '', min: '', max: '', tag: '' };
+  var batchMode = false, picked = {};
+  var POOL = '__pool';
+  var rateSrc = '';
+
+  // ---------- 工具 ----------
+  function $(id) { return document.getElementById(id); }
+  function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function money(n) {
+    n = Math.round(Number(n) || 0);
+    var sign = n < 0 ? '-' : '';
+    return sign + 'NT$ ' + Math.abs(n).toLocaleString('zh-TW');
+  }
+  function toNum(v) { var n = Number(v); return isFinite(n) && n > 0 ? n : 0; }
+  function num(n) { return Number(n).toLocaleString('zh-TW', { maximumFractionDigits: 6 }); }
+  function pct(a, b) { return b > 0 ? Math.round(a / b * 100) : 0; }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function dayDiff(a, b) { // b - a，以天計
+    return Math.round((Date.parse(b + 'T00:00:00') - Date.parse(a + 'T00:00:00')) / 86400000);
+  }
+  function md(d) { return d ? d.slice(5).replace('-', '/') : ''; }
+  function parseMembers(text) {
+    var out = [];
+    String(text).split(/[,，、;；\n]+/).forEach(function (s) {
+      s = s.trim();
+      if (s && out.indexOf(s) < 0) out.push(s);
+    });
+    return out;
+  }
+  function flash(id, text) {
+    if (!storageOK) return;
+    var el = $(id); if (!el) return;
+    el.textContent = text || '✓ 已儲存';
+    clearTimeout(el._t);
+    el._t = setTimeout(function () { el.textContent = ''; }, 2000);
+  }
+
+  // ---------- 資料 ----------
+  function blankTrip(name) {
+    var cb = {}; CATEGORIES.forEach(function (c) { cb[c] = 0; });
+    return {
+      id: uid('t'), name: name || '', destination: '', startDate: '', endDate: '',
+      travelers: 0, totalBudget: 0, reserve: 0, catBudgets: cb, dailyLimit: 0, alertPct: 80, presetRates: {},
+      cardFee: 1.5, cashback: 0, tripBudget: 0, poolAlert: 0, displayCur: '', contributions: [],
+      note: '', archived: false, members: [], rates: {}, lastCurrency: 'TWD',
+      expenses: [], exchanges: [], settlements: [], createdAt: Date.now()
+    };
+  }
+  function normTrip(d) {
+    var t = blankTrip();
+    if (!d || typeof d !== 'object') return t;
+    if (d.id) t.id = String(d.id);
+    t.name = d.tripName != null ? String(d.tripName) : (d.name ? String(d.name) : '');
+    ['destination', 'startDate', 'endDate', 'note'].forEach(function (k) { if (d[k]) t[k] = String(d[k]); });
+    t.travelers = toNum(d.travelers);
+    t.totalBudget = toNum(d.totalBudget);
+    t.reserve = toNum(d.reserve);
+    t.dailyLimit = toNum(d.dailyLimit);
+    t.alertPct = toNum(d.alertPct) || 80;
+    if (d.presetRates && typeof d.presetRates === 'object') {
+      Object.keys(d.presetRates).forEach(function (c) { if (validCur(c) && c !== 'TWD' && toNum(d.presetRates[c])) t.presetRates[c] = toNum(d.presetRates[c]); });
+    }
+    if (toNum(d.jpyRate) && !t.presetRates.JPY) t.presetRates.JPY = toNum(d.jpyRate);
+    t.archived = !!d.archived;
+    CATEGORIES.forEach(function (c) { t.catBudgets[c] = (d.catBudgets && toNum(d.catBudgets[c])) || 0; });
+    t.members = Array.isArray(d.members) ? d.members.filter(function (m) { return typeof m === 'string' && m; }) : [];
+    t.rates = (d.rates && typeof d.rates === 'object') ? d.rates : {};
+    t.lastCurrency = validCur(d.lastCurrency) ? d.lastCurrency : 'TWD';
+    t.expenses = Array.isArray(d.expenses) ? d.expenses : [];
+    t.exchanges = Array.isArray(d.exchanges) ? d.exchanges : [];
+    t.settlements = Array.isArray(d.settlements) ? d.settlements : [];
+    t.contributions = Array.isArray(d.contributions) ? d.contributions : [];
+    t.cardFee = (d.cardFee !== undefined && d.cardFee !== '' && isFinite(Number(d.cardFee)) && Number(d.cardFee) >= 0) ? Number(d.cardFee) : 1.5;
+    t.cashback = toNum(d.cashback);
+    t.tripBudget = toNum(d.tripBudget);
+    t.poolAlert = toNum(d.poolAlert);
+    t.displayCur = (validCur(d.displayCur) && d.displayCur !== 'TWD') ? d.displayCur : '';
+    if (d.createdAt) t.createdAt = d.createdAt;
+    return t;
+  }
+  function ensureTrip() {
+    if (!db.trips.length) db.trips.push(blankTrip(''));
+    if (!db.trips.some(function (t) { return t.id === db.currentId; })) db.currentId = db.trips[0].id;
+  }
+  function load() {
+    try {
+      var raw2 = localStorage.getItem(KEY2);
+      if (raw2) {
+        var d = JSON.parse(raw2);
+        db.trips = (d.trips || []).map(normTrip);
+        db.currentId = d.currentId;
+      } else {
+        // 從舊版（單一旅行）資料自動轉移；舊資料保留不刪除
+        var raw1 = localStorage.getItem(KEY1);
+        if (raw1) db.trips = [normTrip(JSON.parse(raw1))];
+      }
+    } catch (e) { storageOK = false; }
+    ensureTrip();
+  }
+  function save() {
+    try { localStorage.setItem(KEY2, JSON.stringify(db)); storageOK = true; }
+    catch (e) { storageOK = false; alert('此瀏覽器無法儲存資料，重新整理後資料可能會遺失。'); }
+  }
+  function T() {
+    for (var i = 0; i < db.trips.length; i++) if (db.trips[i].id === db.currentId) return db.trips[i];
+    ensureTrip(); return db.trips[0];
+  }
+  function tripDays(t) {
+    if (!t.startDate || !t.endDate) return 0;
+    var n = dayDiff(t.startDate, t.endDate) + 1;
+    return n > 0 ? n : 0;
+  }
+  function travelers(t) { return t.travelers || t.members.length || 1; }
+  function preSpentOf(t) {
+    return t.expenses.reduce(function (a, e) { return a + (e.pre && !e.proxy ? (Number(e.amount) || 0) : 0); }, 0);
+  }
+  function tripBudgetOf(t) { return t.tripBudget || Math.max(0, t.totalBudget - t.reserve - preSpentOf(t)); }
+  function dailyLimit(t) {
+    if (t.dailyLimit) return { v: t.dailyLimit, auto: false };
+    var d = tripDays(t);
+    if (d && (t.totalBudget || t.tripBudget)) return { v: tripBudgetOf(t) / d, auto: true };
+    return { v: 0, auto: false };
+  }
+  function counted(t) { return t.expenses.filter(function (e) { return !e.proxy; }); }
+  function totalSpent(t) {
+    return counted(t).reduce(function (s, e) { return s + (Number(e.amount) || 0); }, 0);
+  }
+  function payerName(p) { return p === POOL ? '公費' : p; }
+  function shareOf(e, n) { return e.shares && Number(e.shares[n]) > 0 ? Number(e.shares[n]) : 1; }
+  function curRate(t, cur) {
+    if (cur === 'TWD') return 1;
+    return t.presetRates[cur] || fxAvgRate(t, cur) || Number(t.rates[cur]) || 0;
+  }
+  function fx2(t, twd) {
+    var c = t.displayCur, r = c ? curRate(t, c) : 0;
+    return r ? '≈ ' + curName(c) + ' ' + Math.round(twd / r).toLocaleString('zh-TW') : '';
+  }
+  function poolStats(t) {
+    var bal = {}, contrib = {}, totalC = 0, spentT = 0;
+    t.members.forEach(function (n) { contrib[n] = 0; });
+    t.contributions.forEach(function (c) {
+      var cur = validCur(c.currency) ? c.currency : 'TWD';
+      bal[cur] = (bal[cur] || 0) + (Number(c.amount) || 0);
+      if (contrib[c.member] !== undefined) { contrib[c.member] += Number(c.twd) || 0; totalC += Number(c.twd) || 0; }
+    });
+    t.exchanges.forEach(function (x) {
+      if (!x.pool) return;
+      bal.TWD = (bal.TWD || 0) - (Number(x.twd) || 0) - (Number(x.fee) || 0);
+      bal[x.currency] = (bal[x.currency] || 0) + (Number(x.foreign) || 0);
+    });
+    t.expenses.forEach(function (e) {
+      if (e.payer !== POOL || e.proxy) return;
+      var cur = validCur(e.currency) ? e.currency : 'TWD';
+      var v = cur === 'TWD' ? (Number(e.amount) || 0) : (Number(e.foreignAmount) || 0);
+      bal[cur] = (bal[cur] || 0) - v;
+      spentT += Number(e.amount) || 0;
+    });
+    var eq = 0;
+    Object.keys(bal).forEach(function (c) { eq += bal[c] * (c === 'TWD' ? 1 : (curRate(t, c) || 0)); });
+    return { bal: bal, contrib: contrib, totalC: totalC, spentT: spentT, leftT: totalC - spentT, eqTWD: eq };
+  }
+  // ---------- 分頁 ----------
+  function showTab(name) {
+    currentTab = name;
+    Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+      b.classList.toggle('active', b.dataset.tab === name);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (p) {
+      p.classList.toggle('active', p.id === 'tab-' + name);
+    });
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- 選單建立 ----------
+  function buildInputs() {
+    var html = '';
+    CATEGORIES.forEach(function (c, i) {
+      html += '<div><label for="cb' + i + '">' + c + '</label>' +
+        '<input id="cb' + i + '" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div>';
+    });
+    $('catBudgetInputs').innerHTML = html;
+    var catOpts = CATEGORIES.map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+    $('expCat').innerHTML = '<option value="">請選擇類別</option>' + catOpts;
+    $('fCat').innerHTML = '<option value="">全部類別</option>' + catOpts;
+    var payOpts = PAYS.map(function (p) { return '<option value="' + p + '">' + p + '</option>'; }).join('');
+    $('expPay').innerHTML = '<option value="">不標記</option>' + payOpts;
+    $('bCat').innerHTML = '<option value="">不變更</option>' + catOpts;
+    $('bPay').innerHTML = '<option value="">不變更</option>' + payOpts + '<option value="__clear">清除付款方式</option>';
+    $('fPay').innerHTML = '<option value="">全部</option>' + payOpts + '<option value="__none">未標記</option>';
+    $('expCurrency').innerHTML = CURRENCIES.map(function (c) {
+      return '<option value="' + c[0] + '">' + c[1] + ' ' + c[0] + '</option>';
+    }).join('');
+    $('cCur').innerHTML = CURRENCIES.map(function (c) { return '<option value="' + c[0] + '">' + c[1] + ' ' + c[0] + '</option>'; }).join('');
+    $('tRateCur').innerHTML = CURRENCIES.slice(1).map(function (c) {
+      return '<option value="' + c[0] + '">' + c[1] + ' ' + c[0] + '</option>';
+    }).join('');
+    $('fxCur').innerHTML = CURRENCIES.slice(1).map(function (c) {
+      return '<option value="' + c[0] + '">' + c[1] + ' ' + c[0] + '</option>';
+    }).join('');
+  }
+
+  // ---------- 頁首 ----------
+  function renderHeader() {
+    var t = T();
+    $('title').textContent = t.name || '旅遊預算與花費管理';
+    document.title = (t.name ? t.name + '｜' : '') + '旅遊預算與花費管理';
+    var trips = db.trips.slice().sort(function (a, b) { return (a.archived - b.archived) || (b.createdAt - a.createdAt); });
+    $('tripSelect').innerHTML = trips.map(function (x) {
+      return '<option value="' + esc(x.id) + '"' + (x.id === t.id ? ' selected' : '') + '>' +
+        esc(x.name || '未命名旅行') + (x.archived ? '（已封存）' : '') + '</option>';
+    }).join('');
+
+    var pills = [];
+    if (t.destination) pills.push('<span class="pill">' + PIN + esc(t.destination) + '</span>');
+    var days = tripDays(t);
+    if (days) {
+      pills.push('<span class="pill">' + md(t.startDate) + ' – ' + md(t.endDate) + '・' + days + ' 天 ' + (days - 1) + ' 夜</span>');
+      var td = today();
+      if (td < t.startDate) pills.push('<span class="pill hl">還有 ' + dayDiff(td, t.startDate) + ' 天出發</span>');
+      else if (td <= t.endDate) pills.push('<span class="pill hl">旅行第 ' + (dayDiff(t.startDate, td) + 1) + ' 天</span>');
+      else pills.push('<span class="pill">旅程已結束</span>');
+    }
+    $('tripMeta').innerHTML = pills.join('');
+  }
+
+  // ---------- 總覽 ----------
+  function renderOverview() {
+    var t = T();
+    var spentByCat = {};
+    CATEGORIES.forEach(function (c) { spentByCat[c] = 0; });
+    var spent = 0, byDate = {}, need = { '必要': 0, '非必要': 0 }, preSpent = 0, ex = counted(t);
+    ex.forEach(function (e) {
+      var amt = Number(e.amount) || 0;
+      spent += amt;
+      if (e.pre) preSpent += amt;
+      if (spentByCat[e.category] === undefined) spentByCat['其他'] += amt;
+      else spentByCat[e.category] += amt;
+      if (!e.pre) byDate[e.date] = (byDate[e.date] || 0) + amt;
+      if (need[e.need] !== undefined) need[e.need] += amt;
+    });
+
+    var left = t.totalBudget - spent;
+    $('sumBudget').textContent = money(t.totalBudget);
+    $('sumSpent').textContent = money(spent);
+    $('sumLeft').textContent = money(left);
+    $('sumLeft').className = 'v ' + (left < 0 ? 'neg' : 'pos');
+    $('sumLeftNote').textContent = left < 0 ? '已超出總預算' : '';
+    $('sumBudget2').textContent = fx2(t, t.totalBudget);
+    $('sumSpent2').textContent = fx2(t, spent);
+    $('sumLeft2').textContent = fx2(t, left);
+    var dopts = '<option value="">只顯示台幣</option>' + CURRENCIES.slice(1).filter(function (c) { return curRate(t, c[0]) > 0; }).map(function (c) {
+      return '<option value="' + c[0] + '"' + (t.displayCur === c[0] ? ' selected' : '') + '>' + c[1] + '</option>';
+    }).join('');
+    $('dispCur').innerHTML = dopts;
+    $('dispCur').value = curRate(t, t.displayCur) > 0 ? t.displayCur : '';
+
+    // 今天還可以花（動態每日額度）
+    var tripSpent = spent - preSpent, td0 = today(), daysAll = tripDays(t);
+    var tripBudget = tripBudgetOf(t);
+    var tv = '', ts = '', th0 = '', neg0 = false, todayLeftV = 0;
+    if (!t.totalBudget && !t.tripBudget) { tv = '—'; th0 = '先到「旅行」分頁設定總預算（或旅途現場預算）和出發、回程日期。'; }
+    else if (!daysAll) { tv = '—'; th0 = '到「旅行」分頁設定出發和回程日期，就能算出每天可以花多少。'; }
+    else if (td0 < t.startDate) {
+      var per = tripBudget / daysAll;
+      tv = money(per); ts = (fx2(t, per) ? fx2(t, per) + '・' : '') + '出發後平均每天可用（共 ' + daysAll + ' 天）';
+      th0 = '旅途現場預算 ' + money(tripBudget) + (t.tripBudget ? '' : '（總預算 − 備用金 − 行前已付）') + '。';
+    } else if (td0 > t.endDate) {
+      tv = '旅程已結束'; ts = '旅途花費 ' + money(tripSpent) + '，旅途現場預算 ' + money(tripBudget);
+      th0 = tripSpent > tripBudget ? '旅途中超出預算 ' + money(tripSpent - tripBudget) + '。' : '旅途中省下 ' + money(tripBudget - tripSpent) + '。';
+    } else {
+      var daysLeft = dayDiff(td0, t.endDate) + 1, spentToday = byDate[td0] || 0;
+      var before = tripSpent - spentToday;
+      var dailyAvail = (tripBudget - before) / daysLeft, todayLeft = dailyAvail - spentToday;
+      neg0 = todayLeft < 0; todayLeftV = todayLeft;
+      tv = neg0 ? '已超出 ' + money(-todayLeft) : money(todayLeft);
+      ts = (fx2(t, Math.abs(todayLeft)) ? fx2(t, Math.abs(todayLeft)) + '・' : '') + '今天可用 ' + money(dailyAvail) + '，已花 ' + money(spentToday);
+      if (daysLeft > 1) {
+        var nextDaily = (tripBudget - before - spentToday) / (daysLeft - 1);
+        th0 = (neg0 ? '今天花超過了，' : '') + '明天起每天可用約 ' + money(nextDaily) + (fx2(t, nextDaily) ? '（' + fx2(t, nextDaily) + '）' : '') + '，還剩 ' + (daysLeft - 1) + ' 天。';
+      } else th0 = '今天是最後一天。';
+    }
+    if (t.displayCur && curRate(t, t.displayCur) > 0 && daysAll && td0 >= t.startDate && td0 <= t.endDate) {
+      var rr = curRate(t, t.displayCur), absV = Math.abs(todayLeftV);
+      tv = (neg0 ? '已超出 ' : '') + curName(t.displayCur) + ' ' + Math.round(absV / rr).toLocaleString('zh-TW');
+      ts = '約 ' + money(absV) + '・' + ts.replace(/^≈[^・]*・/, '');
+    }
+    $('todayV').textContent = tv;
+    $('todayV').className = 'today-v' + (neg0 ? ' neg' : '');
+    $('todayS').textContent = ts;
+    $('todayHint').textContent = th0;
+
+    // 小統計
+    var n = travelers(t), dl = dailyLimit(t);
+    var minis = [
+      ['已使用', t.totalBudget ? pct(spent, t.totalBudget) + '%' : '—'],
+      ['每人預算（' + n + ' 人）', t.totalBudget ? money(t.totalBudget / n) : '—'],
+      [dl.auto ? '每日預算（平均）' : '每日上限', dl.v ? money(dl.v) : '—'],
+      ['緊急備用金', t.reserve ? money(t.reserve) : '—'],
+      ['行前已付', money(preSpent)],
+      ['旅途花費', money(spent - preSpent)]
+    ];
+    $('minis').innerHTML = minis.map(function (m) {
+      return '<div class="mini"><div class="t">' + m[0] + '</div><div class="v">' + m[1] + '</div></div>';
+    }).join('');
+
+    // 類別比較
+    var rows = '';
+    CATEGORIES.forEach(function (c) {
+      var b = t.catBudgets[c] || 0, s = spentByCat[c], r = b - s;
+      var p = b > 0 ? Math.min(100, s / b * 100) : (s > 0 ? 100 : 0);
+      var info = [];
+      if (t.totalBudget && b) info.push('占預算 ' + pct(b, t.totalBudget) + '%');
+      if (b) info.push('已用 ' + pct(s, b) + '%');
+      rows += '<tr><td class="catcell"><span class="tag">' + c + '</span>' +
+        (info.length ? '<span class="meta">' + info.join('・') + '</span>' : '') +
+        '<div class="bar"><span class="' + (s > b ? 'over' : '') + '" style="width:' + p + '%"></span></div></td>' +
+        '<td data-label="預算" class="num">' + money(b) + '</td>' +
+        '<td data-label="實際花費" class="num">' + money(s) + '</td>' +
+        '<td data-label="剩餘" class="num ' + (r < 0 ? 'neg' : '') + '">' + money(r) + (r < 0 ? '<small>（已超支）</small>' : '') + '</td></tr>';
+    });
+    $('catTable').innerHTML = rows;
+
+    // 提醒（只在畫面上顯示）
+    var alerts = [], th = t.alertPct || 80, td = today();
+    if (!t.totalBudget) alerts.push(['w', '還沒設定總預算，先到「旅行」分頁設定預算吧。']);
+    else {
+      var up = pct(spent, t.totalBudget);
+      if (spent > t.totalBudget) alerts.push(['d', '已超出總預算 ' + money(spent - t.totalBudget) + '。']);
+      else if (up >= th) alerts.push(['w', '總預算已使用 ' + up + '%，已達提醒門檻 ' + th + '%。']);
+      if (t.reserve && left >= 0 && left < t.reserve) alerts.push(['w', '剩餘預算 ' + money(left) + '，已低於緊急備用金 ' + money(t.reserve) + '。']);
+    }
+    CATEGORIES.forEach(function (c) {
+      var b = t.catBudgets[c] || 0, s = spentByCat[c];
+      if (b && s > b) alerts.push(['d', c + '已超支 ' + money(s - b) + '。']);
+      else if (b && pct(s, b) >= th) alerts.push(['w', c + '預算已使用 ' + pct(s, b) + '%。']);
+    });
+    var inTrip = t.startDate && t.endDate && td >= t.startDate && td <= t.endDate;
+    if (inTrip) {
+      if (!byDate[td]) alerts.push(['w', '今天還沒有記帳喔，有花費記得到「記帳」新增。']);
+      else if (!dl.auto && dl.v && byDate[td] > dl.v) alerts.push(['d', '今天已花 ' + money(byDate[td]) + '，超過每日上限 ' + money(dl.v) + '。']);
+      else if (dl.auto && neg0) alerts.push(['d', '今天的可用額度已超出 ' + money(-todayLeftV) + '，明天起每日可用會自動下修。']);
+    }
+    if (t.members.length >= 2 && t.contributions.length) {
+      var psA = poolStats(t);
+      if (psA.leftT < -0.5) alerts.push(['d', '公費已經不夠用（超出 ' + money(-psA.leftT) + '），請到「分帳」分頁補繳公費或修改付款人。']);
+      else if (t.poolAlert && psA.eqTWD < t.poolAlert) alerts.push(['w', '公費只剩約 ' + money(psA.eqTWD) + '，該補繳公費了。']);
+    }
+    var unpaid = t.expenses.filter(function (e) { return e.proxy && !e.proxyGot; });
+    if (unpaid.length) alerts.push(['w', '有 ' + unpaid.length + ' 筆代購還沒收款，共 ' + money(unpaid.reduce(function (a, e) { return a + (Number(e.amount) || 0); }, 0)) + '。']);
+    if (t.endDate && td > t.endDate && t.members.length >= 2 && calcSettle(t).moves.length) {
+      alerts.push(['w', '旅程已結束，還有分帳沒結清，記得到「分帳」查看。']);
+    }
+    if (!alerts.length) alerts.push(['', '目前預算狀況良好。']);
+    $('alerts').innerHTML = alerts.map(function (a) { return '<li class="' + a[0] + '">' + esc(a[1]) + '</li>'; }).join('');
+
+    // 每日花費長條
+    var dates = Object.keys(byDate).sort();
+    if (!dates.length) {
+      $('dayBars').innerHTML = '<p class="empty">還沒有花費紀錄。</p>';
+    } else {
+      var max = Math.max.apply(null, dates.map(function (d) { return byDate[d]; }).concat([dl.v || 0]));
+      $('dayBars').innerHTML = dates.map(function (d) {
+        var v = byDate[d], over = dl.v && v > dl.v;
+        return '<div class="dayrow"><span>' + esc(d.slice(5).replace('-', '/')) + '</span>' +
+          '<div class="track"><span class="' + (over ? 'over' : '') + '" style="width:' + (max ? v / max * 100 : 0) + '%"></span></div>' +
+          '<span class="amt ' + (over ? 'neg' : '') + '">' + money(v) + '</span></div>';
+      }).join('') + (dl.v ? '<p class="hint" style="margin:4px 0 0">紅色表示超過' + (dl.auto ? '平均每日預算 ' : '每日上限 ') + money(dl.v) + '；行前已付與代購不列入。</p>' : '');
+    }
+
+    // 重點數字
+    var facts = [];
+    if (dates.length) {
+      var topD = dates.reduce(function (a, b) { return byDate[b] > byDate[a] ? b : a; });
+      facts.push(['花費最高的日期', topD.replace(/-/g, '/') + '・' + money(byDate[topD])]);
+      facts.push(['旅途中有記帳的日子平均', money((spent - preSpent) / dates.length) + ' / 天']);
+    }
+    var topC = CATEGORIES.reduce(function (a, b) { return spentByCat[b] > spentByCat[a] ? b : a; });
+    if (spentByCat[topC] > 0) facts.push(['花費最高的類別', topC + '・' + money(spentByCat[topC]) + '（' + pct(spentByCat[topC], spent) + '%）']);
+    if (spent > 0 && n > 1) facts.push(['平均每人花費', money(spent / n)]);
+    var fixedSum = ex.reduce(function (a, e) { return a + (e.fixed ? (Number(e.amount) || 0) : 0); }, 0);
+    if (fixedSum > 0) facts.push(['固定／變動支出', money(fixedSum) + ' ／ ' + money(spent - fixedSum)]);
+    var nt = need['必要'] + need['非必要'];
+    if (nt > 0) facts.push(['必要／非必要支出', pct(need['必要'], nt) + '% ／ ' + pct(need['非必要'], nt) + '%']);
+    $('facts').innerHTML = facts.map(function (f) {
+      return '<div class="fact"><div class="t">' + f[0] + '</div><div class="v">' + esc(f[1]) + '</div></div>';
+    }).join('');
+
+    var top = ex.slice().sort(function (a, b) { return b.amount - a.amount; }).slice(0, 5);
+    $('topList').innerHTML = top.length ? top.map(function (e) {
+      return '<li>' + esc(e.item) + '・<span class="tag gray">' + esc(e.category) + '</span> <b>' + money(e.amount) + '</b> <span class="meta" style="display:inline">' + esc(e.date) + '</span></li>';
+    }).join('') : '<li class="hint" style="list-style:none;margin-left:-22px">還沒有花費紀錄。</li>';
+
+    // 代購／伴手禮
+    var px = t.expenses.filter(function (e) { return e.proxy; });
+    $('proxyCard').style.display = px.length ? '' : 'none';
+    if (px.length) {
+      var pxAll = px.reduce(function (a, e) { return a + (Number(e.amount) || 0); }, 0);
+      var pxDue = px.filter(function (e) { return !e.proxyGot; }).reduce(function (a, e) { return a + (Number(e.amount) || 0); }, 0);
+      $('proxySum').textContent = '代購 ' + px.length + ' 筆，共 ' + money(pxAll) + '；未收款 ' + money(pxDue) + '。';
+      $('proxyList').innerHTML = px.map(function (e) {
+        return '<tr><td data-label="項目"><div>' + esc(e.item) + '<span class="meta">' + esc(e.date) + '</span></div></td>' +
+          '<td data-label="幫誰買">' + esc(e.proxyFor || '—') + '</td>' +
+          '<td data-label="金額" class="num">' + money(e.amount) + '</td>' +
+          '<td data-label="收款" class="num"><button class="small ' + (e.proxyGot ? 'assist' : 'secondary') + '" data-act="proxyGot" data-id="' + esc(e.id) + '">' + (e.proxyGot ? '已收款 ✓' : '標記已收款') + '</button></td></tr>';
+      }).join('');
+    }
+  }
+
+  // ---------- 記帳表單 ----------
+  function fxAvgRate(t, cur) {
+    var f = 0, tw = 0;
+    t.exchanges.forEach(function (x) { if (x.currency === cur) { f += Number(x.foreign) || 0; tw += (Number(x.twd) || 0) + (Number(x.fee) || 0); } });
+    return f > 0 ? tw / f : 0;
+  }
+  function autoRate() {
+    var t = T(), cur = $('expCurrency').value, pay = $('expPay').value;
+    var payer = $('splitBlock').style.display === 'none' ? '' : $('expPayer').value;
+    if (cur === 'TWD') { $('expRate').value = ''; rateSrc = ''; return; }
+    var avg = fxAvgRate(t, cur), r = 0;
+    if ((pay === '現金' || payer === POOL) && avg) { r = avg; rateSrc = 'cash'; }
+    else if (t.presetRates[cur]) { r = t.presetRates[cur]; rateSrc = 'preset'; }
+    else if (t.rates[cur]) { r = Number(t.rates[cur]); rateSrc = 'last'; }
+    else if (avg) { r = avg; rateSrc = 'cash'; }
+    else rateSrc = '';
+    $('expRate').value = r ? Math.round(r * 1e6) / 1e6 : '';
+  }
+  function cardAdjFor(t, cur, pay) { return (cur !== 'TWD' && pay === '信用卡') ? (Number(t.cardFee) || 0) - (Number(t.cashback) || 0) : 0; }
+  function updateCurrencyUI() {
+    var t = T(), cur = $('expCurrency').value, isTWD = cur === 'TWD', pay = $('expPay').value;
+    $('rateField').style.display = isTWD ? 'none' : '';
+    if ($('liveMsg') && $('liveMsg').dataset.cur !== cur) { $('liveMsg').textContent = ''; $('liveMsg').dataset.cur = cur; }
+    $('expAmountLabel').textContent = '金額（' + curName(cur) + '）';
+    var el = $('convertHint');
+    if (isTWD) { el.innerHTML = ''; return; }
+    var a = Number($('expAmount').value), r = Number($('expRate').value), unit = '1 ' + curName(cur);
+    var src = { cash: '現金：使用你的換匯成本', preset: '旅行設定的預設匯率', last: '上次使用的匯率', manual: '自行輸入', live: '今天的參考匯率' }[rateSrc] || '';
+    var lines = [];
+    if (r > 0) lines.push(esc(unit + ' = ' + num(r) + ' 新台幣' + (src ? '（' + src + '）' : '')));
+    else lines.push(esc('匯率請填「' + unit + '可換多少新台幣」。'));
+    if (pay === '信用卡') {
+      var adj = cardAdjFor(t, cur, pay);
+      if (a > 0 && r > 0) lines.push(esc('刷卡：' + num(a) + ' × ' + num(r) + ' × (1 + 手續費 ' + num(t.cardFee) + '% − 回饋 ' + num(t.cashback) + '%) ≈ ' + money(a * r * (1 + adj / 100))));
+      lines.push(esc('刷卡請填刷卡當天的匯率（可查發卡銀行或 Visa／Mastercard 公告）。也可以按「查詢今天的參考匯率」，但實際扣款以發卡銀行為準。'));
+    } else if (a > 0 && r > 0) {
+      lines.push(esc('換算約 ' + money(a * r) + '（統計以新台幣計算）'));
+    }
+    var avg = fxAvgRate(t, cur);
+    if (avg && rateSrc !== 'cash') lines.push('你的換匯成本：' + num(Math.round(avg * 1e6) / 1e6) + ' <button type="button" class="linkbtn" id="useAvgRate">套用</button>');
+    el.innerHTML = lines.join('<br>');
+    if ($('useAvgRate')) $('useAvgRate').onclick = function () { $('expRate').value = Math.round(avg * 1e6) / 1e6; rateSrc = 'cash'; updateCurrencyUI(); };
+  }
+  function onCurrencyChange() {
+    autoRate();
+    updateCurrencyUI();
+    renderQuickAmts();
+    updateInstHint();
+  }
+  function renderSplitUI(payer, split, shares) {
+    var m = T().members;
+    $('splitBlock').style.display = m.length ? '' : 'none';
+    if (!m.length) return;
+    var opts = m.slice();
+    if (m.length >= 2) opts.unshift(POOL);
+    if (opts.indexOf(payer) < 0) payer = m[0];
+    if (!split) split = m;
+    $('expPayer').innerHTML = opts.map(function (n) {
+      return '<option value="' + esc(n) + '"' + (n === payer ? ' selected' : '') + '>' + esc(n === POOL ? '公費（公費錢包）' : n) + '</option>';
+    }).join('');
+    $('expSplit').innerHTML = m.map(function (n) {
+      var w = shares && Number(shares[n]) > 0 ? Number(shares[n]) : 1;
+      return '<label><input type="checkbox" value="' + esc(n) + '"' + (split.indexOf(n) >= 0 ? ' checked' : '') + '>' + esc(n) +
+        ' <input type="number" class="w" data-w="' + esc(n) + '" min="0.1" step="0.5" inputmode="decimal" value="' + w + '" aria-label="' + esc(n) + ' 的份數"><span class="unit">份</span></label>';
+    }).join('');
+    renderReceiptOwners();
+  }
+  function currentSplit() {
+    return Array.prototype.slice.call($('expSplit').querySelectorAll('input[type=checkbox]:checked')).map(function (x) { return x.value; });
+  }
+  function currentShares() {
+    var out = {}, custom = false;
+    currentSplit().forEach(function (n) {
+      var el = $('expSplit').querySelector('input[data-w="' + n.replace(/"/g, '\\"') + '"]');
+      var w = el ? Number(el.value) : 1;
+      if (!(w > 0)) w = 1;
+      out[n] = w; if (w !== 1) custom = true;
+    });
+    return custom ? out : null;
+  }
+  function receiptRowHTML() {
+    return '<div class="rrow"><input type="text" class="rname" placeholder="細項名稱，例如：面膜">' +
+      '<input type="number" class="ramt" min="0" step="any" inputmode="decimal" placeholder="金額">' +
+      '<select class="rown"></select><button type="button" class="small danger rm">移除</button></div>';
+  }
+  function renderReceiptOwners() {
+    var m = T().members;
+    Array.prototype.forEach.call(document.querySelectorAll('#receiptRows .rown'), function (sel) {
+      var v = sel.value || '__shared';
+      sel.innerHTML = '<option value="__shared">' + (m.length ? '大家分攤（依上方勾選）' : '一般花費') + '</option>' +
+        m.map(function (n) { return '<option value="' + esc(n) + '">只算 ' + esc(n) + ' 自己的</option>'; }).join('');
+      sel.value = Array.prototype.some.call(sel.options, function (o) { return o.value === v; }) ? v : '__shared';
+      sel.style.display = m.length ? '' : 'none';
+    });
+  }
+  function receiptRows() {
+    return Array.prototype.map.call(document.querySelectorAll('#receiptRows .rrow'), function (row) {
+      return { name: row.querySelector('.rname').value.trim(), amount: Number(row.querySelector('.ramt').value), owner: row.querySelector('.rown').value || '__shared' };
+    }).filter(function (x) { return x.amount > 0; });
+  }
+  function updateReceiptSum() {
+    var rows = receiptRows(), cur = $('expCurrency').value;
+    var sum = rows.reduce(function (a, x) { return a + x.amount; }, 0);
+    $('receiptSum').textContent = rows.length ? '細項 ' + rows.length + ' 筆，合計 ' + curName(cur) + ' ' + num(Math.round(sum * 100) / 100) + '；新增後會拆成 ' + rows.length + ' 筆紀錄。' : '';
+  }
+  function clearReceipt() { $('receiptRows').innerHTML = ''; $('receiptSum').textContent = ''; $('receiptBox').open = false; }
+  function renderItemList() {
+    var seen = {}, out = [];
+    db.trips.forEach(function (t) {
+      t.expenses.slice().reverse().forEach(function (e) {
+        if (e.item && !seen[e.item] && out.length < 60) { seen[e.item] = 1; out.push(e.item); }
+      });
+    });
+    $('itemList').innerHTML = out.map(function (s) { return '<option value="' + esc(s) + '">'; }).join('');
+  }
+
+  function resetForm() {
+    var t = T();
+    editingId = null;
+    $('expDate').value = today();
+    ['expItem', 'expAmount', 'expNote', 'expTime', 'expPlace'].forEach(function (id) { $(id).value = ''; });
+    $('expCat').value = '';
+    $('expPay').value = '';
+    $('expNeed').value = '';
+    $('expFixed').checked = false;
+    $('expInst').value = '';
+    $('instHint').textContent = '';
+    $('expPre').checked = !!(t.startDate && today() < t.startDate);
+    $('expProxy').checked = false; $('expProxyFor').value = ''; $('expProxyGot').checked = false; $('proxyBlock').style.display = 'none';
+    clearReceipt(); $('receiptBox').style.display = '';
+    $('expCurrency').value = t.lastCurrency;
+    renderSplitUI(null, null, null);
+    onCurrencyChange();
+    $('formError').textContent = '';
+    $('formTitle').textContent = '新增一筆花費';
+    $('submitExp').textContent = '新增花費';
+    $('cancelEdit').style.display = 'none';
+  }
+
+  function fillForm(e) {
+    var cur = validCur(e.currency) ? e.currency : 'TWD';
+    $('expItem').value = e.item || '';
+    $('expCat').value = CATEGORIES.indexOf(e.category) >= 0 ? e.category : '其他';
+    $('expCurrency').value = cur;
+    $('expAmount').value = cur === 'TWD' ? e.amount : e.foreignAmount;
+    $('expRate').value = cur === 'TWD' ? '' : e.rate;
+    $('expNote').value = e.note || '';
+    $('expTime').value = e.time || '';
+    $('expPlace').value = e.place || '';
+    $('expPay').value = PAYS.indexOf(e.pay) >= 0 ? e.pay : '';
+    $('expNeed').value = e.need || '';
+    $('expFixed').checked = !!e.fixed;
+    $('expInst').value = e.inst >= 2 ? e.inst : '';
+    $('expPre').checked = !!e.pre;
+    $('expProxy').checked = !!e.proxy; $('expProxyFor').value = e.proxyFor || ''; $('expProxyGot').checked = !!e.proxyGot;
+    $('proxyBlock').style.display = e.proxy ? '' : 'none';
+    if (e.time || e.place || e.need || e.fixed || e.inst || e.pre || e.proxy) $('moreFields').open = true;
+    clearReceipt(); $('receiptBox').style.display = 'none';
+    renderSplitUI(e.payer, e.split && e.split.length ? e.split : null, e.shares);
+    rateSrc = 'manual';
+    updateCurrencyUI();
+    updateInstHint();
+    $('formError').textContent = '';
+    $('cancelEdit').style.display = '';
+  }
+
+  function submitExpense() {
+    var t = T();
+    var date = $('expDate').value;
+    var item = $('expItem').value.trim();
+    var cat = $('expCat').value;
+    var cur = $('expCurrency').value || 'TWD';
+    var pay = $('expPay').value;
+    var input = Number($('expAmount').value);
+    var rate = cur === 'TWD' ? 1 : Number($('expRate').value);
+    var hasMembers = t.members.length > 0;
+    var payer = hasMembers ? $('expPayer').value : '';
+    var split = hasMembers ? currentSplit() : [];
+    var shares = hasMembers ? currentShares() : null;
+    var rows = editingId ? [] : receiptRows();
+    var proxy = $('expProxy').checked;
+
+    var err = [];
+    if (!date) err.push('日期');
+    if (!item) err.push('花費項目');
+    if (CATEGORIES.indexOf(cat) < 0) err.push('類別');
+    if (!rows.length && !(input > 0)) err.push('金額（需大於 0）');
+    if (cur !== 'TWD' && !(rate > 0)) err.push('匯率（需大於 0）');
+    if (hasMembers && !split.length) err.push('分攤的人（至少勾選一位）');
+    var instRaw = $('expInst').value, inst = Math.round(Number(instRaw));
+    if (instRaw !== '' && !(inst >= 2)) err.push('分期期數（至少 2 期，不分期請留白）');
+    if (err.length) { $('formError').textContent = '請填寫：' + err.join('、'); return; }
+    if (proxy && payer === POOL) { $('formError').textContent = '代購請選擇實際付錢的人，不要用公費。'; return; }
+
+    var adj = cardAdjFor(t, cur, pay);
+    function toTWD(v) { return cur === 'TWD' ? v : Math.round(v * rate * (1 + adj / 100) * 100) / 100; }
+    function build(name, v, sp, sh) {
+      return {
+        date: date, item: name, category: cat, amount: toTWD(v),
+        currency: cur, foreignAmount: cur === 'TWD' ? null : v, rate: cur === 'TWD' ? null : rate, cardAdj: adj || 0,
+        payer: payer, split: sp, shares: sh, note: $('expNote').value.trim(),
+        time: $('expTime').value, place: $('expPlace').value.trim(), pay: pay, need: $('expNeed').value,
+        fixed: $('expFixed').checked, inst: instRaw === '' ? 0 : inst, pre: $('expPre').checked,
+        proxy: proxy, proxyFor: proxy ? $('expProxyFor').value.trim() : '', proxyGot: proxy ? $('expProxyGot').checked : false
+      };
+    }
+
+    var created = 0;
+    if (editingId) {
+      var e = t.expenses.find(function (x) { return x.id === editingId; });
+      var f = build(item, input, split, shares);
+      if (e) Object.keys(f).forEach(function (k) { e[k] = f[k]; });
+    } else {
+      var list = rows.length ? rows.map(function (rw, i) {
+        var own = rw.owner !== '__shared' && hasMembers;
+        return build(item + '：' + (rw.name || '細項' + (i + 1)), rw.amount, own ? [rw.owner] : split, own ? null : shares);
+      }) : [build(item, input, split, shares)];
+      if (!rows.length) {
+        var amt0 = list[0].amount;
+        var dup = t.expenses.some(function (x) { return x.date === date && x.item === item && Math.abs((Number(x.amount) || 0) - amt0) < 0.01; });
+        if (dup && !confirm('已經有一筆「' + date + ' ' + item + ' ' + money(amt0) + '」的紀錄，可能是重複輸入。仍要新增嗎？')) return;
+      }
+      list.forEach(function (f, i) { f.id = uid('e'); f.createdAt = Date.now() + i; t.expenses.push(f); });
+      created = list.length;
+    }
+    if (cur !== 'TWD' && rateSrc !== 'cash') t.rates[cur] = rate;
+    t.lastCurrency = cur;
+    var wasEditing = !!editingId;
+    save();
+    resetForm();
+    renderAll();
+    if ($('quickIn')) { $('quickIn').value = ''; $('quickMsg').textContent = ''; }
+    flash('expSavedMsg', wasEditing ? '✓ 已儲存修改' : (created > 1 ? '✓ 已拆成 ' + created + ' 筆並儲存' : '✓ 已儲存'));
+  }
+  function startEdit(id) {
+    var e = T().expenses.find(function (x) { return x.id === id; });
+    if (!e) return;
+    showTab('add');
+    editingId = id;
+    $('expDate').value = e.date;
+    fillForm(e);
+    $('formTitle').textContent = '修改花費紀錄';
+    $('submitExp').textContent = '儲存修改';
+  }
+  function startCopy(id) {
+    var e = T().expenses.find(function (x) { return x.id === id; });
+    if (!e) return;
+    showTab('add');
+    editingId = null;
+    $('expDate').value = today();
+    fillForm(e);
+    $('formTitle').textContent = '新增一筆花費（已複製內容，可修改後新增）';
+    $('submitExp').textContent = '新增花費';
+  }
+  function deleteExp(id) {
+    var t = T();
+    var e = t.expenses.find(function (x) { return x.id === id; });
+    if (!e) return;
+    if (!confirm('確定要刪除「' + e.item + '」（' + money(e.amount) + '）這筆紀錄嗎？')) return;
+    t.expenses = t.expenses.filter(function (x) { return x.id !== id; });
+    if (editingId === id) resetForm();
+    save();
+    renderAll();
+    flash('listSavedMsg');
+  }
+
+  // ---------- 常用金額 ----------
+  var PRESETS = { TWD: [100, 300, 500, 1000, 2000], JPY: [500, 1000, 3000, 5000, 10000], KRW: [5000, 10000, 30000, 50000, 100000],
+    VND: [50000, 100000, 200000, 500000], THB: [100, 300, 500, 1000], USD: [10, 20, 50, 100], EUR: [10, 20, 50, 100] };
+  function renderQuickAmts() {
+    var t = T(), cur = $('expCurrency').value || 'TWD', count = {}, last = {};
+    t.expenses.forEach(function (e, i) {
+      var c = validCur(e.currency) ? e.currency : 'TWD';
+      if (c !== cur) return;
+      var v = c === 'TWD' ? Number(e.amount) : Number(e.foreignAmount);
+      if (!(v > 0)) return;
+      count[v] = (count[v] || 0) + 1; last[v] = i;
+    });
+    var used = Object.keys(count).map(Number).filter(function (v) { return count[v] >= 2; })
+      .sort(function (a, b) { return (count[b] - count[a]) || (last[b] - last[a]); }).slice(0, 3);
+    var list = used.slice();
+    (PRESETS[cur] || [10, 50, 100, 500, 1000]).forEach(function (v) { if (list.length < 6 && list.indexOf(v) < 0) list.push(v); });
+    list.sort(function (a, b) { return a - b; });
+    $('quickAmts').innerHTML = '<span class="ql">常用金額</span>' + list.map(function (v) {
+      return '<button type="button" data-quick="' + v + '">' + num(v) + '</button>';
+    }).join('');
+  }
+  function updateInstHint() {
+    var n = Math.round(Number($('expInst').value)), a = Number($('expAmount').value);
+    var cur = $('expCurrency').value, rate = cur === 'TWD' ? 1 : Number($('expRate').value);
+    if ($('expInst').value === '') { $('instHint').textContent = ''; return; }
+    if (!(n >= 2)) { $('instHint').textContent = '分期至少 2 期；不分期請留白。'; return; }
+    $('instHint').textContent = '分 ' + n + ' 期' + (a > 0 && rate > 0 ? '，每期約 ' + money(a * rate / n) : '') + '（預算統計仍以全額計算）';
+  }
+
+  // ---------- 批次修改／刪除 ----------
+  function pickedIds() {
+    var ids = T().expenses.map(function (e) { return e.id; });
+    return Object.keys(picked).filter(function (id) { return picked[id] && ids.indexOf(id) >= 0; });
+  }
+  function renderBatchBar() {
+    $('batchBar').style.display = batchMode ? '' : 'none';
+    $('batchToggle').style.display = batchMode ? 'none' : '';
+    if (!batchMode) return;
+    var m = T().members;
+    $('bPayerWrap').style.display = m.length ? '' : 'none';
+    var keep = $('bPayer').value;
+    $('bPayer').innerHTML = '<option value="">不變更</option>' + (m.length >= 2 ? '<option value="' + POOL + '"' + (keep === POOL ? ' selected' : '') + '>公費</option>' : '') + m.map(function (n) {
+      return '<option value="' + esc(n) + '"' + (n === keep ? ' selected' : '') + '>' + esc(n) + '</option>';
+    }).join('');
+    $('batchCount').textContent = '已選 ' + pickedIds().length + ' 筆';
+  }
+  function setBatch(on) {
+    batchMode = on; picked = {};
+    ['bCat', 'bDate', 'bPay', 'bPayer', 'bNeed', 'bFixed'].forEach(function (id) { $(id).value = ''; });
+    $('batchMsg') && ($('batchMsg').textContent = '');
+    renderList();
+  }
+  function batchApply() {
+    var ids = pickedIds();
+    if (!ids.length) { alert('請先勾選要修改的紀錄。'); return; }
+    var ch = { cat: $('bCat').value, date: $('bDate').value, pay: $('bPay').value, payer: $('bPayer').value, need: $('bNeed').value, fixed: $('bFixed').value };
+    if (!Object.keys(ch).some(function (k) { return ch[k] !== ''; })) { alert('請至少選擇一個要修改的欄位。'); return; }
+    if (!confirm('確定要修改已選的 ' + ids.length + ' 筆紀錄嗎？')) return;
+    T().expenses.forEach(function (e) {
+      if (ids.indexOf(e.id) < 0) return;
+      if (ch.cat) e.category = ch.cat;
+      if (ch.date) e.date = ch.date;
+      if (ch.pay) e.pay = ch.pay === '__clear' ? '' : ch.pay;
+      if (ch.payer) e.payer = ch.payer;
+      if (ch.need) e.need = ch.need === '__clear' ? '' : ch.need;
+      if (ch.fixed) e.fixed = ch.fixed === '1';
+    });
+    save();
+    renderAll();
+    flash('listSavedMsg', '✓ 已修改 ' + ids.length + ' 筆');
+  }
+  function batchDelete() {
+    var ids = pickedIds();
+    if (!ids.length) { alert('請先勾選要刪除的紀錄。'); return; }
+    if (!confirm('確定要刪除已選的 ' + ids.length + ' 筆紀錄嗎？刪除後無法復原。')) return;
+    var t = T();
+    t.expenses = t.expenses.filter(function (e) { return ids.indexOf(e.id) < 0; });
+    if (editingId && ids.indexOf(editingId) >= 0) resetForm();
+    picked = {};
+    save();
+    renderAll();
+    flash('listSavedMsg', '✓ 已刪除 ' + ids.length + ' 筆');
+  }
+
+  // ---------- 明細 ----------
+  function filtered(t) {
+    var kw = filters.kw.trim().toLowerCase();
+    var min = filters.min === '' ? null : Number(filters.min), max = filters.max === '' ? null : Number(filters.max);
+    return t.expenses.filter(function (e) {
+      if (kw && [e.item, e.place, e.note, e.payer].join(' ').toLowerCase().indexOf(kw) < 0) return false;
+      if (filters.cat && e.category !== filters.cat) return false;
+      if (filters.pay === '__none' && e.pay) return false;
+      if (filters.pay && filters.pay !== '__none' && e.pay !== filters.pay) return false;
+      if (filters.from && e.date < filters.from) return false;
+      if (filters.to && e.date > filters.to) return false;
+      if (min !== null && e.amount < min) return false;
+      if (max !== null && e.amount > max) return false;
+      if (filters.tag === 'fixed' && !e.fixed) return false;
+      if (filters.tag === 'var' && e.fixed) return false;
+      if (filters.tag === 'inst' && !(e.inst >= 2)) return false;
+      if (filters.tag === 'pre' && !e.pre) return false;
+      if (filters.tag === 'trip' && (e.pre || e.proxy)) return false;
+      if (filters.tag === 'proxy' && !e.proxy) return false;
+      if (filters.tag === 'pool' && e.payer !== POOL) return false;
+      return true;
+    }).sort(function (a, b) {
+      var ka = a.date + (a.time || ''), kb = b.date + (b.time || '');
+      if (ka === kb) return b.createdAt - a.createdAt;
+      return ka < kb ? 1 : -1;
+    });
+  }
+  function renderList() {
+    var t = T(), list = filtered(t);
+    renderBatchBar();
+    var active = Object.keys(filters).some(function (k) { return filters[k] !== ''; });
+    var sum = list.reduce(function (s, e) { return s + (Number(e.amount) || 0); }, 0);
+    $('filterSum').textContent = (active ? '篩選結果：' : '共 ') + list.length + ' 筆，合計 ' + money(sum);
+    if (!list.length) {
+      $('expList').innerHTML = '<tr><td colspan="5" class="empty">' +
+        (t.expenses.length ? '沒有符合篩選條件的紀錄。' : '目前還沒有花費紀錄，請在上方新增一筆。') + '</td></tr>';
+      return;
+    }
+    $('expList').innerHTML = list.map(function (e) {
+      var meta = [];
+      var info = [e.pre ? '行前已付' : '', e.time, e.place, e.pay, e.need, e.fixed ? '固定支出' : '', e.inst >= 2 ? '分 ' + e.inst + ' 期・每期 ' + money(e.amount / e.inst) : ''].filter(Boolean);
+      if (e.proxy) meta.push('代購' + (e.proxyFor ? '：幫' + esc(e.proxyFor) + '買' : '') + '・' + (e.proxyGot ? '已收款' : '未收款') + '（不算旅遊花費）');
+      if (info.length) meta.push(info.map(esc).join('・'));
+      if (e.payer) meta.push('付款：' + esc(payerName(e.payer)) + (e.split && e.split.length ? '・分攤：' + e.split.map(function (n) { return esc(n) + (e.shares ? '×' + num(shareOf(e, n)) : ''); }).join('、') : ''));
+      if (e.note) meta.push('備註：' + esc(e.note));
+      var amtMeta = (e.currency && e.currency !== 'TWD')
+        ? '<span class="meta">' + curName(e.currency) + ' ' + num(e.foreignAmount) + '・匯率 ' + num(e.rate) + (e.cardAdj ? '・刷卡 ' + (e.cardAdj > 0 ? '+' : '') + num(e.cardAdj) + '%' : '') + '</span>' : '';
+      return '<tr' + (batchMode && picked[e.id] ? ' class="picked"' : '') + '>' +
+        '<td data-label="日期">' + esc(e.date) + '</td>' +
+        '<td data-label="項目"><div>' + esc(e.item) + meta.map(function (m) { return '<span class="meta">' + m + '</span>'; }).join('') + '</div></td>' +
+        '<td data-label="類別"><span class="tag">' + esc(e.category) + '</span></td>' +
+        '<td data-label="金額" class="num"><div>' + money(e.amount) + amtMeta + '</div></td>' +
+        '<td data-label="' + (batchMode ? '選取' : '操作') + '" class="num">' + (batchMode
+          ? '<label class="pick"><input type="checkbox" data-pick="' + esc(e.id) + '"' + (picked[e.id] ? ' checked' : '') + '>選取</label>'
+          : '<button class="small secondary" data-act="edit" data-id="' + esc(e.id) + '">修改</button> ' +
+            '<button class="small secondary" data-act="copy" data-id="' + esc(e.id) + '">複製</button> ' +
+            '<button class="small danger" data-act="del" data-id="' + esc(e.id) + '">刪除</button>') +
+        '</td></tr>';
+    }).join('');
+  }
+  function csvCell(v) {
+    v = v == null ? '' : String(v);
+    if (/^[=+\-@]/.test(v) && isNaN(Number(v))) v = "'" + v;
+    return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  }
+  function download(name, text, type) {
+    var blob = new Blob([text], { type: type });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name.replace(/[\\\/:*?"<>|]/g, '');
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  function exportCSV() {
+    var t = T();
+    var head = ['日期', '時間', '項目', '類別', '幣別', '外幣金額', '匯率', '刷卡調整%', '新台幣金額', '付款方式', '地點', '必要性', '固定支出', '分期期數', '每期金額', '行前已付', '代購對象', '代購收款', '付款人', '分攤的人', '備註'];
+    var rows = filtered(t).slice().reverse().map(function (e) {
+      var foreign = e.currency && e.currency !== 'TWD';
+      return [e.date, e.time, e.item, e.category, curName(e.currency || 'TWD'), foreign ? e.foreignAmount : '', foreign ? e.rate : '', e.cardAdj || '',
+        e.amount, e.pay, e.place, e.need, e.fixed ? '是' : '', e.inst >= 2 ? e.inst : '', e.inst >= 2 ? Math.round(e.amount / e.inst) : '',
+        e.pre ? '是' : '', e.proxy ? (e.proxyFor || '是') : '', e.proxy ? (e.proxyGot ? '已收' : '未收') : '',
+        payerName(e.payer), (e.split || []).map(function (n) { return n + (e.shares ? '×' + shareOf(e, n) : ''); }).join('、'), e.note].map(csvCell).join(',');
+    });
+    download((t.name || '旅遊花費') + '_花費明細_' + today() + '.csv', '﻿' + [head.join(',')].concat(rows).join('\r\n'), 'text/csv;charset=utf-8');
+  }
+
+  // ---------- 分帳 ----------
+  function calcSettle(t) {
+    var m = t.members, paid = {}, owed = {}, adj = {}, skipped = 0, group = 0;
+    m.forEach(function (n) { paid[n] = 0; owed[n] = 0; adj[n] = 0; });
+    var ps = poolStats(t);
+    m.forEach(function (n) { paid[n] += ps.contrib[n] || 0; });
+    t.expenses.forEach(function (e) {
+      if (e.proxy) return;
+      var amt = Number(e.amount) || 0;
+      var split = (e.split || []).filter(function (n) { return m.indexOf(n) >= 0; });
+      var payerOK = e.payer === POOL || m.indexOf(e.payer) >= 0;
+      if (!e.payer || !payerOK || !split.length) { skipped++; return; }
+      if (e.payer !== POOL) paid[e.payer] += amt;
+      if (split.length > 1) group += amt;
+      var tw = split.reduce(function (a, n) { return a + shareOf(e, n); }, 0);
+      split.forEach(function (n) { owed[n] += amt * shareOf(e, n) / tw; });
+    });
+    // 公費剩下的錢按出資比例退回
+    if (ps.leftT > 0 && ps.totalC > 0) m.forEach(function (n) { paid[n] -= ps.leftT * (ps.contrib[n] || 0) / ps.totalC; });
+    t.settlements.forEach(function (s) {
+      if (adj[s.from] !== undefined) adj[s.from] += Number(s.amount) || 0;
+      if (adj[s.to] !== undefined) adj[s.to] -= Number(s.amount) || 0;
+    });
+    var bal = {}, debtors = [], creditors = [];
+    m.forEach(function (n) {
+      bal[n] = paid[n] - owed[n] + adj[n];
+      if (bal[n] < -0.5) debtors.push({ n: n, v: -bal[n] });
+      else if (bal[n] > 0.5) creditors.push({ n: n, v: bal[n] });
+    });
+    // 債務簡化：金額最大的欠款人先還給金額最大的債權人，轉帳次數最多為（人數 − 1）
+    debtors.sort(function (a, b) { return b.v - a.v; });
+    creditors.sort(function (a, b) { return b.v - a.v; });
+    var moves = [], i = 0, j = 0;
+    while (i < debtors.length && j < creditors.length) {
+      var x = Math.min(debtors[i].v, creditors[j].v);
+      if (Math.round(x) > 0) moves.push({ from: debtors[i].n, to: creditors[j].n, amount: Math.round(x) });
+      debtors[i].v -= x; creditors[j].v -= x;
+      if (debtors[i].v < 0.5) i++;
+      if (creditors[j].v < 0.5) j++;
+    }
+    return { paid: paid, owed: owed, bal: bal, moves: moves, skipped: skipped, group: group, pool: ps };
+  }
+  function renderSplit() {
+    var t = T(), m = t.members, ok = m.length >= 2;
+    $('splitEmpty').style.display = ok ? 'none' : '';
+    $('settleCard').style.display = ok ? '' : 'none';
+    if (!ok) return;
+    var r = calcSettle(t);
+    renderPool(t, r.pool);
+    $('settleTable').innerHTML = m.map(function (n) {
+      var b = Math.round(r.bal[n]);
+      var cls = b < 0 ? 'neg' : (b > 0 ? 'pos' : '');
+      var txt = b > 0 ? '應收 ' + money(b) : (b < 0 ? '應付 ' + money(-b) : '已打平');
+      return '<tr><td data-label="旅伴"><b>' + esc(n) + '</b></td><td data-label="已付" class="num">' + money(r.paid[n]) + '</td>' +
+        '<td data-label="個人花費" class="num">' + money(r.owed[n]) + '</td><td data-label="結果" class="num ' + cls + '">' + txt + '</td></tr>';
+    }).join('');
+    $('settleMoves').innerHTML = r.moves.length ? r.moves.map(function (mv) {
+      return '<li><span>' + esc(mv.from) + ' → ' + esc(mv.to) + '：<b>' + money(mv.amount) + '</b></span>' +
+        '<button class="small assist" data-act="settle" data-from="' + esc(mv.from) + '" data-to="' + esc(mv.to) + '" data-amt="' + mv.amount + '">標記已轉帳</button></li>';
+    }).join('') : '<li class="hint" style="border:none">目前大家已經打平，不需要互相轉帳。</li>';
+    var poolOver = r.pool.leftT < -0.5;
+    if (poolOver) {
+      $('settleMoves').innerHTML = '<li class="hint warn" style="border:none">公費已經不夠用（超出 ' + money(-r.pool.leftT) + '），超出的部分不知道是誰墊的，所以先不計算轉帳。請先補繳公費，或把付款人改成實際墊錢的人。</li>';
+    }
+    $('settleHint').textContent = r.skipped
+      ? '有 ' + r.skipped + ' 筆花費沒有指定付款人或分攤的人（或旅伴名字已更改），未計入分帳；可在「記帳」分頁下方的紀錄按「修改」補上。' : '';
+    $('groupHint').textContent = '團體共同支出（兩人以上分攤）合計 ' + money(r.group) + '。「個人花費」是每個人實際該負擔的金額。';
+
+    var recs = t.settlements.slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
+    $('settleRecords').innerHTML = recs.length ? recs.map(function (s) {
+      return '<tr><td data-label="日期">' + esc(s.date) + '</td><td data-label="轉帳">' + esc(s.from) + ' → ' + esc(s.to) + '</td>' +
+        '<td data-label="金額" class="num">' + money(s.amount) + '</td>' +
+        '<td data-label="操作" class="num"><button class="small danger" data-act="delSettle" data-id="' + esc(s.id) + '">刪除</button></td></tr>';
+    }).join('') : '<tr><td colspan="4" class="empty">還沒有結算紀錄。</td></tr>';
+  }
+
+  function renderPool(t, ps) {
+    var m = t.members, codes = CURRENCIES.map(function (c) { return c[0]; }).filter(function (c) { return ps.bal[c] !== undefined; });
+    $('poolBal').innerHTML = codes.length ? codes.map(function (c) {
+      var v = Math.round(ps.bal[c] * 100) / 100;
+      return '<div class="box"><div class="t">公費剩餘（' + curName(c) + '）</div><div class="v' + (v < 0 ? ' neg' : '') + '" style="font-size:1.2rem">' +
+        (c === 'TWD' ? money(v) : num(v)) + '</div></div>';
+    }).join('') : '<p class="hint" style="margin:0">還沒有收公費。</p>';
+    $('poolHint').textContent = codes.length ? '已收公費 ' + money(ps.totalC) + '，已用 ' + money(ps.spentT) + '，剩餘約合 ' + money(ps.eqTWD) + '。' +
+      (t.poolAlert && ps.eqTWD < t.poolAlert ? ' 已低於提醒金額 ' + money(t.poolAlert) + '，該補繳公費了。' : '') : '';
+    var over = codes.length && ps.leftT < -0.5;
+    if (over) $('poolHint').textContent += ' ⚠️ 公費已經不夠用（超出 ' + money(-ps.leftT) + '）。請大家補繳公費，或把其中一筆的付款人改成實際墊錢的人，分帳才會正確。';
+    $('poolHint').className = 'hint' + ((over || (t.poolAlert && codes.length && ps.eqTWD < t.poolAlert)) ? ' warn' : '');
+    var keep = $('cMember').value;
+    $('cMember').innerHTML = m.map(function (n) { return '<option value="' + esc(n) + '"' + (n === keep ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('');
+    $('poolAlert').value = t.poolAlert || '';
+    var list = t.contributions.slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
+    $('cList').innerHTML = list.length ? list.map(function (c) {
+      var cur = validCur(c.currency) ? c.currency : 'TWD';
+      return '<tr><td data-label="日期">' + esc(c.date) + '</td><td data-label="誰交的">' + esc(c.member) + '</td>' +
+        '<td data-label="金額" class="num"><div>' + (cur === 'TWD' ? money(c.amount) : curName(cur) + ' ' + num(c.amount) + '<span class="meta">約 ' + money(c.twd) + '</span>') + '</div></td>' +
+        '<td data-label="操作" class="num"><button class="small danger" data-act="delContrib" data-id="' + esc(c.id) + '">刪除</button></td></tr>';
+    }).join('') : '<tr><td colspan="4" class="empty">還沒有公費紀錄。</td></tr>';
+  }
+  function updateContribUI() {
+    var t = T(), cur = $('cCur').value;
+    $('cAmountLabel').textContent = '金額（' + curName(cur) + '）';
+    $('cRateWrap').style.display = cur === 'TWD' ? 'none' : '';
+    if (cur !== 'TWD' && !$('cRate').value) $('cRate').value = curRate(t, cur) ? Math.round(curRate(t, cur) * 1e6) / 1e6 : '';
+  }
+  function addContrib(members) {
+    var t = T(), cur = $('cCur').value, amount = Number($('cAmount').value), rate = cur === 'TWD' ? 1 : Number($('cRate').value), date = $('cDate').value || today();
+    var err = [];
+    if (!(amount > 0)) err.push('金額');
+    if (cur !== 'TWD' && !(rate > 0)) err.push('匯率');
+    if (err.length) { $('cError').textContent = '請填寫：' + err.join('、'); return; }
+    $('cError').textContent = '';
+    members.forEach(function (n, i) {
+      t.contributions.push({ id: uid('c'), date: date, member: n, currency: cur, amount: amount, rate: rate, twd: Math.round(amount * rate * 100) / 100, createdAt: Date.now() + i });
+    });
+    $('cAmount').value = '';
+    save(); renderAll(); flash('poolSavedMsg', '✓ 已記錄 ' + members.length + ' 筆公費');
+  }
+
+  // ---------- 外幣 ----------
+  function updateFxHint() {
+    var cur = $('fxCur').value, f = Number($('fxForeign').value), tw = Number($('fxTwd').value), fee = Number($('fxFee').value) || 0;
+    $('fxForeignLabel').textContent = '換到的外幣（' + curName(cur) + '）';
+    $('fxHint').textContent = (f > 0 && tw > 0)
+      ? '實際匯率：1 ' + curName(cur) + ' ≈ ' + num(Math.round((tw + fee) / f * 1e6) / 1e6) + ' 新台幣' + (fee ? '（含手續費）' : '') : '';
+  }
+  function submitFx() {
+    var t = T();
+    var x = {
+      id: uid('x'), date: $('fxDate').value, currency: $('fxCur').value,
+      foreign: Number($('fxForeign').value), twd: Number($('fxTwd').value), fee: Number($('fxFee').value) || 0,
+      note: $('fxNote').value.trim(), pool: T().members.length >= 2 && $('fxPool').checked, createdAt: Date.now()
+    };
+    var err = [];
+    if (!x.date) err.push('日期');
+    if (!(x.foreign > 0)) err.push('換到的外幣');
+    if (!(x.twd > 0)) err.push('付出的新台幣');
+    if (x.fee < 0) err.push('手續費');
+    if (err.length) { $('fxError').textContent = '請填寫：' + err.join('、'); return; }
+    t.exchanges.push(x);
+    save();
+    $('fxError').textContent = '';
+    ['fxForeign', 'fxTwd', 'fxFee', 'fxNote'].forEach(function (id) { $(id).value = ''; });
+    $('fxPool').checked = false;
+    updateFxHint();
+    renderAll();
+    flash('fxSavedMsg');
+  }
+  function renderFx() {
+    var t = T(), stats = {};
+    function S(c) { return stats[c] || (stats[c] = { spentF: 0, spentT: 0, cashF: 0, exF: 0, exT: 0, fee: 0 }); }
+    $('fxPoolWrap').style.display = t.members.length >= 2 ? '' : 'none';
+    t.expenses.forEach(function (e) {
+      if (e.payer === POOL) return;
+      var c = validCur(e.currency) ? e.currency : 'TWD', s = S(c);
+      s.spentT += Number(e.amount) || 0;
+      s.spentF += c === 'TWD' ? (Number(e.amount) || 0) : (Number(e.foreignAmount) || 0);
+      if (c !== 'TWD' && e.pay === '現金') s.cashF += Number(e.foreignAmount) || 0;
+    });
+    var feeTotal = 0;
+    t.exchanges.forEach(function (x) {
+      if (x.pool) { feeTotal += Number(x.fee) || 0; return; }
+      var s = S(x.currency);
+      s.exF += Number(x.foreign) || 0; s.exT += Number(x.twd) || 0; s.fee += Number(x.fee) || 0;
+      feeTotal += Number(x.fee) || 0;
+    });
+    var codes = CURRENCIES.map(function (c) { return c[0]; }).filter(function (c) { return stats[c]; });
+    $('curTable').innerHTML = codes.length ? codes.map(function (c) {
+      var s = stats[c], isT = c === 'TWD';
+      var avg = s.exF > 0 ? num(Math.round((s.exT + s.fee) / s.exF * 1e6) / 1e6) : '—';
+      var remain = s.exF > 0 ? s.exF - s.cashF : null;
+      return '<tr><td data-label="幣別">' + curName(c) + ' ' + c + '</td>' +
+        '<td data-label="花費（外幣）" class="num">' + (isT ? '—' : num(Math.round(s.spentF * 100) / 100)) + '</td>' +
+        '<td data-label="花費（台幣）" class="num">' + money(s.spentT) + '</td>' +
+        '<td data-label="換匯平均匯率" class="num">' + (isT ? '—' : avg) + '</td>' +
+        '<td data-label="剩餘現金" class="num ' + (remain !== null && remain < 0 ? 'neg' : '') + '">' +
+          (remain === null ? '—' : num(Math.round(remain * 100) / 100) + ' ' + curName(c)) + '</td></tr>';
+    }).join('') : '<tr><td colspan="5" class="empty">還沒有花費或換匯紀錄。</td></tr>';
+    $('fxSumHint').textContent = '剩餘現金 = 自己換匯取得的外幣 − 自己用「現金」付的外幣花費（含代購）；公費的部分請看「分帳」分頁的公費錢包。' +
+      (feeTotal ? ' 換匯手續費合計 ' + money(feeTotal) + '。' : '');
+
+    var list = t.exchanges.slice().sort(function (a, b) { return a.date < b.date ? 1 : (a.date > b.date ? -1 : b.createdAt - a.createdAt); });
+    $('fxList').innerHTML = list.length ? list.map(function (x) {
+      return '<tr><td data-label="日期">' + esc(x.date) + '</td>' +
+        '<td data-label="換匯"><div>' + curName(x.currency) + ' ' + num(x.foreign) +
+          (x.pool ? '<span class="meta">用公費換匯</span>' : '') + (x.note ? '<span class="meta">' + esc(x.note) + '</span>' : '') + '</div></td>' +
+        '<td data-label="付出台幣" class="num"><div>' + money(x.twd) + (x.fee ? '<span class="meta">手續費 ' + money(x.fee) + '</span>' : '') + '</div></td>' +
+        '<td data-label="實際匯率" class="num">' + num(Math.round((x.twd + (x.fee || 0)) / x.foreign * 1e6) / 1e6) + '</td>' +
+        '<td data-label="操作" class="num"><button class="small danger" data-act="delFx" data-id="' + esc(x.id) + '">刪除</button></td></tr>';
+    }).join('') : '<tr><td colspan="5" class="empty">還沒有換匯紀錄。</td></tr>';
+  }
+
+  // ---------- 旅行設定 ----------
+  function fillTripForm() {
+    var t = T();
+    $('tripName').value = t.name;
+    $('tDest').value = t.destination;
+    $('tStart').value = t.startDate;
+    $('tEnd').value = t.endDate;
+    $('totalBudget').value = t.totalBudget || '';
+    $('tTravelers').value = t.travelers || '';
+    $('tReserve').value = t.reserve || '';
+    CATEGORIES.forEach(function (c, i) { $('cb' + i).value = t.catBudgets[c] || ''; });
+    $('tDaily').value = t.dailyLimit || '';
+    $('tAlert').value = t.alertPct || 80;
+    $('tCardFee').value = t.cardFee;
+    $('tCashback').value = t.cashback || '';
+    $('tTripBudget').value = t.tripBudget || '';
+    draftRates = JSON.parse(JSON.stringify(t.presetRates));
+    var firstSet = CURRENCIES.slice(1).map(function (c) { return c[0]; }).filter(function (c) { return draftRates[c]; })[0];
+    $('tRateCur').value = firstSet || 'JPY';
+    renderRateField();
+    $('members').value = t.members.join('、');
+    $('tNote').value = t.note;
+    $('tripError').textContent = '';
+    updateBudgetHint();
+  }
+  function updateBudgetHint() {
+    var sum = 0;
+    CATEGORIES.forEach(function (c, i) { sum += toNum($('cb' + i).value); });
+    var total = toNum($('totalBudget').value);
+    var hint = '各類別預算合計：' + money(sum);
+    var el = $('budgetHint');
+    if (total > 0 && sum < total) {
+      hint += '，還有 ' + money(total - sum) + ' 尚未分配到各類別。';
+      el.className = 'hint warn';
+    } else if (total > 0 && sum > total) {
+      hint += '，已超出總預算 ' + money(sum - total) + '。';
+      el.className = 'hint warn';
+    } else {
+      el.className = 'hint';
+    }
+    el.textContent = hint;
+
+    // 天數、每人、每日
+    var s = $('tStart').value, e = $('tEnd').value, days = 0;
+    if (s && e) days = dayDiff(s, e) + 1;
+    $('tDaysHint').textContent = (s && e) ? (days > 0 ? '共 ' + days + ' 天 ' + (days - 1) + ' 夜' : '回程日期不能早於出發日期') : '';
+    $('tDaysHint').className = 'hint' + (days <= 0 && s && e ? ' warn' : '');
+    var n = toNum($('tTravelers').value) || parseMembers($('members').value).length || 1;
+    var reserve = toNum($('tReserve').value);
+    var parts = [];
+    if (total) parts.push('每人預算約 ' + money(total / n) + '（' + n + ' 人）');
+    var tb = toNum($('tTripBudget').value) || Math.max(0, total - reserve - preSpentOf(T()));
+    if (tb && days > 0) parts.push('旅途中每日可用約 ' + money(tb / days));
+    if (reserve) parts.push('扣除備用金後可自由花用 ' + money(Math.max(0, total - reserve)));
+    $('perPersonHint').textContent = parts.join('，');
+    $('tDaily').placeholder = (tb && days > 0) ? '自動：' + Math.round(tb / days) : '例如：3000';
+  }
+  var draftRates = {};
+  function renderRateField() {
+    var cur = $('tRateCur').value;
+    $('tRateLabel').textContent = '1 ' + curName(cur) + ' = ? 新台幣';
+    $('tRateVal').value = draftRates[cur] || '';
+    var set = CURRENCIES.slice(1).filter(function (c) { return draftRates[c[0]] > 0; })
+      .map(function (c) { return c[1] + ' ' + num(draftRates[c[0]]); });
+    $('tRateHint').textContent = (set.length ? '已設定：' + set.join('、') + '。' : '') +
+      '每種外幣可以各設一個匯率，切換幣別即可設定下一種；按「儲存設定」後，記帳選該幣別會自動帶入，個別花費仍可修改。';
+  }
+  function renderRateField_hintOnly() {
+    var v = $('tRateVal').value; renderRateField(); $('tRateVal').value = v;
+  }
+  function saveTrip() {
+    var t = T();
+    var s = $('tStart').value, e = $('tEnd').value;
+    if (s && e && e < s) { $('tripError').textContent = '回程日期不能早於出發日期。'; return; }
+    $('tripError').textContent = '';
+    t.name = $('tripName').value.trim();
+    t.destination = $('tDest').value.trim();
+    t.startDate = s; t.endDate = e;
+    t.totalBudget = toNum($('totalBudget').value);
+    t.travelers = Math.round(toNum($('tTravelers').value));
+    t.reserve = toNum($('tReserve').value);
+    CATEGORIES.forEach(function (c, i) { t.catBudgets[c] = toNum($('cb' + i).value); });
+    t.dailyLimit = toNum($('tDaily').value);
+    t.alertPct = Math.min(100, Math.round(toNum($('tAlert').value))) || 80;
+    t.cardFee = $('tCardFee').value === '' ? 1.5 : (Number($('tCardFee').value) >= 0 ? Number($('tCardFee').value) : 1.5);
+    t.cashback = toNum($('tCashback').value);
+    t.tripBudget = toNum($('tTripBudget').value);
+    draftRates[$('tRateCur').value] = toNum($('tRateVal').value);
+    t.presetRates = {};
+    Object.keys(draftRates).forEach(function (c) { if (draftRates[c] > 0) t.presetRates[c] = draftRates[c]; });
+    t.members = parseMembers($('members').value);
+    t.note = $('tNote').value.trim();
+    save();
+    fillTripForm();
+    if (t.members.length) renderSplitUI($('expPayer').value, editingId ? currentSplit() : null);
+    else renderSplitUI(null, null);
+    renderAll();
+    flash('savedMsg');
+  }
+  function renderTrips() {
+    var trips = db.trips.slice().sort(function (a, b) { return (a.archived - b.archived) || (b.createdAt - a.createdAt); });
+    $('tripList').innerHTML = trips.map(function (t) {
+      var sp = totalSpent(t), cur = t.id === db.currentId, days = tripDays(t);
+      return '<tr><td data-label="旅行"><div>' + esc(t.name || '未命名旅行') +
+          (cur ? ' <span class="tag">目前</span>' : '') + (t.archived ? ' <span class="tag gray">已封存</span>' : '') +
+          (t.destination ? '<span class="meta">' + PIN + esc(t.destination) + '</span>' : '') + '</div></td>' +
+        '<td data-label="日期">' + (days ? md(t.startDate) + '–' + md(t.endDate) + '（' + days + ' 天）' : '—') + '</td>' +
+        '<td data-label="預算" class="num">' + money(t.totalBudget) + '</td>' +
+        '<td data-label="花費" class="num"><div>' + money(sp) + (days && sp ? '<span class="meta">平均 ' + money(sp / days) + ' / 天</span>' : '') + '</div></td>' +
+        '<td data-label="操作" class="num">' +
+          (cur ? '' : '<button class="small assist" data-act="switch" data-id="' + esc(t.id) + '">切換</button> ') +
+          '<button class="small secondary" data-act="archive" data-id="' + esc(t.id) + '">' + (t.archived ? '取消封存' : '封存') + '</button> ' +
+          '<button class="small danger" data-act="delTrip" data-id="' + esc(t.id) + '">刪除</button>' +
+        '</td></tr>';
+    }).join('');
+  }
+  function switchTrip(id) {
+    db.currentId = id;
+    batchMode = false; picked = {};
+    save();
+    clearFilters(true);
+    fillTripForm();
+    resetForm();
+    renderAll();
+  }
+  function createTrip(copyFrom) {
+    var name = prompt('新旅行的名稱（之後也可以修改）', copyFrom ? (copyFrom.name || '旅行') + '（複製）' : '');
+    if (name === null) return;
+    var t = blankTrip(name.trim());
+    if (copyFrom) {
+      t.totalBudget = copyFrom.totalBudget; t.reserve = copyFrom.reserve; t.travelers = copyFrom.travelers;
+      t.dailyLimit = copyFrom.dailyLimit; t.alertPct = copyFrom.alertPct; t.destination = copyFrom.destination; t.presetRates = JSON.parse(JSON.stringify(copyFrom.presetRates));
+      t.cardFee = copyFrom.cardFee; t.cashback = copyFrom.cashback; t.tripBudget = copyFrom.tripBudget; t.poolAlert = copyFrom.poolAlert;
+      t.members = copyFrom.members.slice(); t.rates = JSON.parse(JSON.stringify(copyFrom.rates)); t.lastCurrency = copyFrom.lastCurrency;
+      CATEGORIES.forEach(function (c) { t.catBudgets[c] = copyFrom.catBudgets[c]; });
+    }
+    db.trips.push(t);
+    switchTrip(t.id);
+    flash('tripSavedMsg', '✓ 已建立新旅行');
+  }
+  function deleteTrip(id) {
+    var t = db.trips.find(function (x) { return x.id === id; });
+    if (!t) return;
+    if (!confirm('確定要刪除「' + (t.name || '未命名旅行') + '」嗎？這趟旅行的所有花費、換匯、分帳紀錄都會一起刪除，無法復原。')) return;
+    db.trips = db.trips.filter(function (x) { return x.id !== id; });
+    ensureTrip();
+    switchTrip(db.trips.some(function (x) { return x.id === db.currentId; }) ? db.currentId : db.trips[0].id);
+    flash('tripSavedMsg', '✓ 已刪除');
+  }
+
+  // ---------- 備份 ----------
+  function exportBackup() {
+    var payload = { app: 'travelBudgetTool', version: 2, exportedAt: new Date().toISOString(), data: db };
+    download('旅遊預算_全部旅行備份_' + today() + '.json', JSON.stringify(payload, null, 2), 'application/json');
+    flash('backupMsg', '✓ 已匯出備份檔');
+  }
+  function importBackup(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var d;
+      try {
+        var obj = JSON.parse(reader.result);
+        d = obj && obj.data ? obj.data : obj;
+        if (!d || (!Array.isArray(d.trips) && !Array.isArray(d.expenses))) throw new Error('bad');
+      } catch (e) {
+        alert('這個檔案不是本工具匯出的備份檔，無法匯入。');
+        return;
+      }
+      if (Array.isArray(d.trips)) {
+        if (!confirm('匯入後，目前所有旅行資料會被備份檔的內容取代，確定要匯入嗎？')) return;
+        db.trips = d.trips.map(normTrip);
+        db.currentId = d.currentId;
+        ensureTrip();
+      } else {
+        // 舊版備份（單一旅行）：加入成一趟新旅行
+        if (!confirm('這是舊版的單趟旅行備份，會加入成一趟新的旅行（不會覆蓋現有資料），確定要匯入嗎？')) return;
+        var t = normTrip(d); t.id = uid('t'); t.createdAt = Date.now();
+        db.trips.push(t); db.currentId = t.id;
+      }
+      save();
+      clearFilters(true);
+      fillTripForm();
+      resetForm();
+      renderAll();
+      flash('backupMsg', '✓ 已匯入並儲存');
+    };
+    reader.onerror = function () { alert('讀取檔案失敗，請再試一次。'); };
+    reader.readAsText(file);
+  }
+
+  // ---------- 篩選 ----------
+  var filterMap = { fKw: 'kw', fCat: 'cat', fPay: 'pay', fFrom: 'from', fTo: 'to', fMin: 'min', fMax: 'max', fTag: 'tag' };
+  function clearFilters(silent) {
+    Object.keys(filterMap).forEach(function (id) { $(id).value = ''; filters[filterMap[id]] = ''; });
+    if (!silent) renderList();
+  }
+
+  // ---------- 全部更新 ----------
+  function renderAll() {
+    renderHeader();
+    renderOverview();
+    renderList();
+    renderSplit();
+    renderFx();
+    if (typeof renderSumCard === 'function' && $('sumCard')) renderSumCard();
+    renderTrips();
+    renderItemList();
+    renderQuickAmts();
+  }
+
+  // ---------- 啟動 ----------
+  buildInputs();
+  load();
+  save();
+  fillTripForm();
+  resetForm();
+  $('fxDate').value = today();
+  $('cDate').value = today();
+  updateContribUI();
+  updateFxHint();
+  renderAll();
+  var t0 = T();
+  showTab(!t0.totalBudget && !t0.expenses.length ? 'trip' : 'overview');
+
+  // 事件
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.addEventListener('click', function () { showTab(b.dataset.tab); });
+  });
+  $('tripSelect').addEventListener('change', function () { switchTrip(this.value); });
+  $('saveBudget').addEventListener('click', saveTrip);
+  $('tRateVal').addEventListener('input', function () { draftRates[$('tRateCur').value] = toNum(this.value); renderRateField_hintOnly(); });
+  $('tRateCur').addEventListener('change', renderRateField);
+  ['totalBudget', 'tStart', 'tEnd', 'tTravelers', 'tReserve', 'members', 'tTripBudget'].forEach(function (id) {
+    $(id).addEventListener('input', updateBudgetHint);
+  });
+  $('catBudgetInputs').addEventListener('input', updateBudgetHint);
+  $('submitExp').addEventListener('click', submitExpense);
+  $('cancelEdit').addEventListener('click', resetForm);
+  $('expCurrency').addEventListener('change', onCurrencyChange);
+  $('expAmount').addEventListener('input', updateCurrencyUI);
+  $('expRate').addEventListener('input', updateCurrencyUI);
+  ['expItem', 'expAmount', 'expRate', 'expNote', 'expPlace'].forEach(function (id) {
+    $(id).addEventListener('keydown', function (ev) { if (ev.key === 'Enter') submitExpense(); });
+  });
+  Object.keys(filterMap).forEach(function (id) {
+    $(id).addEventListener('input', function () { filters[filterMap[id]] = this.value; renderList(); });
+  });
+  $('clearFilter').addEventListener('click', function () { clearFilters(false); });
+  $('expPay').addEventListener('change', function () { autoRate(); updateCurrencyUI(); updateInstHint(); });
+  $('expPayer').addEventListener('change', function () { autoRate(); updateCurrencyUI(); });
+  $('expRate').addEventListener('input', function () { rateSrc = 'manual'; });
+  $('expDate').addEventListener('change', function () { var t = T(); if (t.startDate && !editingId) $('expPre').checked = this.value < t.startDate; });
+  $('expProxy').addEventListener('change', function () { $('proxyBlock').style.display = this.checked ? '' : 'none'; });
+  $('addRow').addEventListener('click', function () {
+    $('receiptRows').insertAdjacentHTML('beforeend', receiptRowHTML());
+    renderReceiptOwners(); updateReceiptSum();
+  });
+  $('receiptRows').addEventListener('input', updateReceiptSum);
+  $('receiptRows').addEventListener('click', function (ev) {
+    var b = ev.target.closest('.rm'); if (!b) return;
+    b.closest('.rrow').remove(); updateReceiptSum();
+  });
+  $('receiptBox').addEventListener('toggle', function () {
+    if (this.open && !$('receiptRows').children.length) { $('receiptRows').insertAdjacentHTML('beforeend', receiptRowHTML() + receiptRowHTML()); renderReceiptOwners(); }
+  });
+  $('dispCur').addEventListener('change', function () { var t = T(); t.displayCur = this.value; save(); renderOverview(); });
+  $('cCur').addEventListener('change', function () { $('cRate').value = ''; updateContribUI(); });
+  $('cSubmit').addEventListener('click', function () { addContrib([$('cMember').value]); });
+  $('cAll').addEventListener('click', function () {
+    var m = T().members;
+    if (Number($('cAmount').value) > 0 && confirm('幫 ' + m.join('、') + ' 每人各記一筆相同金額的公費？')) addContrib(m);
+    else if (!(Number($('cAmount').value) > 0)) $('cError').textContent = '請先填寫金額。';
+  });
+  $('poolAlert').addEventListener('change', function () { var t = T(); t.poolAlert = toNum(this.value); save(); renderAll(); flash('poolSavedMsg'); });
+  $('quickAmts').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-quick]'); if (!b) return;
+    $('expAmount').value = b.dataset.quick; updateCurrencyUI(); updateInstHint(); $('expAmount').focus();
+  });
+  $('expInst').addEventListener('input', updateInstHint);
+  $('expAmount').addEventListener('input', updateInstHint);
+  $('expRate').addEventListener('input', updateInstHint);
+  $('batchToggle').addEventListener('click', function () { setBatch(true); });
+  $('batchDone').addEventListener('click', function () { setBatch(false); });
+  $('batchAll').addEventListener('click', function () { filtered(T()).forEach(function (e) { picked[e.id] = true; }); renderList(); });
+  $('batchNone').addEventListener('click', function () { picked = {}; renderList(); });
+  $('batchApply').addEventListener('click', batchApply);
+  $('batchDel').addEventListener('click', batchDelete);
+  $('expList').addEventListener('change', function (ev) {
+    var c = ev.target.closest('input[data-pick]'); if (!c) return;
+    picked[c.dataset.pick] = c.checked;
+    c.closest('tr').classList.toggle('picked', c.checked);
+    $('batchCount').textContent = '已選 ' + pickedIds().length + ' 筆';
+  });
+  $('csvBtn').addEventListener('click', exportCSV);
+  $('printBtn').addEventListener('click', function () { window.print(); });
+  ['fxCur', 'fxForeign', 'fxTwd', 'fxFee'].forEach(function (id) { $(id).addEventListener('input', updateFxHint); });
+  $('fxSubmit').addEventListener('click', submitFx);
+  $('newTripBtn').addEventListener('click', function () { createTrip(null); });
+  $('copyTripBtn').addEventListener('click', function () { createTrip(T()); });
+  $('exportBtn').addEventListener('click', exportBackup);
+  $('importBtn').addEventListener('click', function () { $('importFile').click(); });
+  $('importFile').addEventListener('change', function () {
+    if (this.files && this.files[0]) importBackup(this.files[0]);
+    this.value = '';
+  });
+
+  // 列表中的按鈕（事件委派）
+  // ---------- 即時參考匯率 ----------
+  var liveCache = {};
+  function fetchJSON(url) {
+    var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+    return fetch(url, ctl ? { signal: ctl.signal, cache: 'no-store' } : { cache: 'no-store' })
+      .then(function (r) { clearTimeout(timer); if (!r.ok) throw new Error('http'); return r.json(); })
+      .catch(function (e) { clearTimeout(timer); throw e; });
+  }
+  function getLiveRate(cur) {
+    if (liveCache[cur] && Date.now() - liveCache[cur].at < 30 * 60000) return Promise.resolve(liveCache[cur]);
+    var lc = cur.toLowerCase();
+    return fetchJSON('https://open.er-api.com/v6/latest/TWD').then(function (d) {
+      var v = d && d.rates && Number(d.rates[cur]);
+      if (!(v > 0)) throw new Error('no');
+      var day = d.time_last_update_unix ? new Date(d.time_last_update_unix * 1000) : new Date();
+      return { rate: 1 / v, date: day.getFullYear() + '/' + (day.getMonth() + 1) + '/' + day.getDate(), src: 'er' };
+    }).catch(function () {
+      return fetchJSON('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/twd.json').then(function (d) {
+        var v = d && d.twd && Number(d.twd[lc]);
+        if (!(v > 0)) throw new Error('no');
+        return { rate: 1 / v, date: String(d.date || '').replace(/-/g, '/'), src: 'fa' };
+      });
+    }).then(function (r) { r.at = Date.now(); liveCache[cur] = r; return r; });
+  }
+  function liveRateClick() {
+    var cur = $('expCurrency').value, msg = $('liveMsg');
+    if (cur === 'TWD') return;
+    if (!navigator.onLine) { msg.textContent = '目前沒有網路，請自己輸入匯率。'; return; }
+    msg.textContent = '查詢中…';
+    getLiveRate(cur).then(function (r) {
+      var v = Math.round(r.rate * 1e6) / 1e6;
+      $('expRate').value = v; rateSrc = 'live'; updateCurrencyUI();
+      msg.dataset.cur = cur;
+      msg.innerHTML = esc('1 ' + curName(cur) + ' ≈ ' + num(v) + ' 新台幣（' + (r.date || '今天') + ' 市場參考匯率，和銀行換匯、刷卡實際匯率會有差距）') +
+        (r.src === 'er' ? ' <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener">Rates By Exchange Rate API</a>' : '');
+    }).catch(function () {
+      msg.textContent = '暫時查不到匯率，請自己輸入（不影響其他功能）。';
+    });
+  }
+
+  // ---------- 快速輸入 ----------
+  var Q_CUR = [[/日圓|日幣|日元|円|¥|￥|yen/i, 'JPY'], [/韓元|韓幣|韓圜|₩|won/i, 'KRW'], [/美金|美元|usd|us\$/i, 'USD'], [/歐元|€|eur/i, 'EUR'],
+    [/人民幣|rmb|cny/i, 'CNY'], [/港幣|港元|hk\$|hkd/i, 'HKD'], [/泰銖|泰幣|฿|thb/i, 'THB'], [/新加坡幣|新幣|sgd/i, 'SGD'], [/英鎊|£|gbp/i, 'GBP'],
+    [/越南盾|越盾|vnd/i, 'VND'], [/台幣|新台幣|ntd|twd|nt\$/i, 'TWD']];
+  var Q_PAY = [[/刷卡|信用卡|卡片/, '信用卡'], [/現金|付現/, '現金'], [/電子支付|line ?pay|apple ?pay|街口|悠遊付|pay\b|掃碼|行動支付|suica|西瓜卡|t-money|八達通/i, '電子支付']];
+  var Q_CAT = [['機票', /機票|航空|班機/], ['住宿', /飯店|旅館|住宿|民宿|hotel|airbnb|旅店|青旅/i], ['租車', /租車/], ['油錢', /加油|油錢|汽油/],
+    ['ETC／高速公路費', /etc|過路費|高速公路|高速費|停車/i], ['景點門票', /門票|入場|樂園|博物館|美術館|展覽|纜車|觀景台|水族館/],
+    ['交通', /計程車|taxi|uber|地鐵|捷運|電車|巴士|公車|新幹線|高鐵|火車|台鐵|jr|船|渡輪|交通|車票|機場線|儲值/i],
+    ['餐飲', /吃|飯|麵|餐|咖啡|飲料|茶|早餐|午餐|晚餐|宵夜|甜點|便當|壽司|燒肉|火鍋|小吃|酒|啤酒|冰|蛋糕|麵包|拉麵|烤肉|居酒屋|炸雞|章魚燒/i],
+    ['購物', /買|藥妝|伴手禮|衣服|鞋|包包|超市|便利商店|超商|紀念品|保養|化妝品|零食|唐吉|outlet|百貨|名產/i]];
+  function quickParse(text) {
+    var s = String(text || '').replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); })
+      .replace(/[，]/g, ',').replace(/[．]/g, '.').trim();
+    var out = { item: '', amount: 0, cur: '', pay: '', cat: '' };
+    var m = s.match(/(\d[\d,]*(?:\.\d+)?)\s*(萬|千|k)?/i);
+    if (m) {
+      var v = Number(m[1].replace(/,/g, ''));
+      if (m[2]) v *= (m[2] === '萬' ? 10000 : 1000);
+      out.amount = v;
+    }
+    Q_CUR.forEach(function (c) { if (!out.cur && c[0].test(s)) out.cur = c[1]; });
+    if (!out.cur && /\d\s*(元|塊)/.test(s)) out.cur = 'TWD';
+    Q_PAY.forEach(function (c) { if (!out.pay && c[0].test(s)) out.pay = c[1]; });
+    var rest = s;
+    if (m) rest = rest.replace(m[0], ' ');
+    Q_CUR.concat(Q_PAY).forEach(function (c) { rest = rest.replace(c[0], ' '); });
+    rest = rest.replace(/(元|塊錢|塊)(?=\s|$)/g, ' ').replace(/用|花了|花|付了|付/g, ' ').replace(/\s+/g, ' ').trim();
+    out.item = rest;
+    Q_CAT.forEach(function (c) { if (!out.cat && c[1].test(rest || s)) out.cat = c[0]; });
+    return out;
+  }
+  function quickApply() {
+    var r = quickParse($('quickIn').value), msg = $('quickMsg'), done = [], miss = [];
+    if (!$('quickIn').value.trim()) { msg.textContent = '先在上面輸入，例如「拉麵 1200 日圓 刷卡」。'; return; }
+    if (r.item) { $('expItem').value = r.item; done.push('項目'); } else miss.push('花費項目');
+    if (r.cur && r.cur !== $('expCurrency').value) { $('expCurrency').value = r.cur; onCurrencyChange(); }
+    if (r.cur) done.push('幣別');
+    if (r.pay) { $('expPay').value = r.pay; done.push('付款方式'); }
+    if (r.amount > 0) { $('expAmount').value = r.amount; done.push('金額'); } else miss.push('金額');
+    if (r.cat) { $('expCat').value = r.cat; done.push('類別（' + r.cat + '）'); } else miss.push('類別');
+    autoRate(); updateCurrencyUI(); updateInstHint();
+    msg.className = 'hint' + (miss.length ? ' warn' : '');
+    msg.textContent = (done.length ? '已帶入：' + done.join('、') + '。' : '') + (miss.length ? '請再確認：' + miss.join('、') + '。' : '') + '確認無誤後按「新增花費」。';
+  }
+
+  // ---------- 旅行總結 ----------
+  function tripSummary(t) {
+    var ex = counted(t), total = 0, pre = 0, byCat = {}, byDate = {};
+    ex.forEach(function (e) {
+      var a = Number(e.amount) || 0; total += a;
+      if (e.pre) pre += a; else byDate[e.date] = (byDate[e.date] || 0) + a;
+      var c = CATEGORIES.indexOf(e.category) >= 0 ? e.category : '其他'; byCat[c] = (byCat[c] || 0) + a;
+    });
+    var days = tripDays(t) || Object.keys(byDate).length || 1;
+    var cats = Object.keys(byCat).map(function (c) { return [c, byCat[c]]; }).sort(function (a, b) { return b[1] - a[1]; });
+    var dates = Object.keys(byDate).sort(function (a, b) { return byDate[b] - byDate[a]; });
+    var top = ex.slice().sort(function (a, b) { return b.amount - a.amount; }).slice(0, 3);
+    return { total: total, pre: pre, trip: total - pre, days: days, n: travelers(t), cats: cats, topDay: dates[0] ? [dates[0], byDate[dates[0]]] : null, top: top, count: ex.length };
+  }
+  function renderSumCard() {
+    var t = T(), has = counted(t).length > 0;
+    $('sumCard').style.display = has ? '' : 'none';
+    if (!has) return;
+    var ended = t.endDate && today() > t.endDate;
+    $('sumCardHint').textContent = ended ? '旅程結束了！看看這趟旅行的錢都花在哪裡 ♡' : '旅程還在進行中，也可以先看目前為止的總結。';
+  }
+  function drawSummary(t) {
+    var S = tripSummary(t), W = 1080, H = 1350, c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    var g = c.getContext('2d'), F = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+    var C = { bg: '#F4ECEC', card: '#FFFAFA', line: '#E6D1D4', main: '#87605F', ink: '#443938', sub: '#6C5D5C', bar: '#DDBEC3', bar2: '#F2D3D8', neg: '#A3394B', pos: '#6E7A5E' };
+    function rr(x, y, w, h, r, fill) { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); g.fillStyle = fill; g.fill(); }
+    function tx(s, x, y, size, color, bold, align) { g.font = (bold ? '700 ' : '400 ') + size + 'px ' + F; g.fillStyle = color; g.textAlign = align || 'left'; g.fillText(s, x, y); }
+    function fit(s, w, size, bold) { g.font = (bold ? '700 ' : '400 ') + size + 'px ' + F; if (g.measureText(s).width <= w) return s; while (s.length > 1 && g.measureText(s + '…').width > w) s = s.slice(0, -1); return s + '…'; }
+    g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+    // 標頭
+    tx('TRAVEL  SUMMARY', 80, 110, 26, C.main, true);
+    tx(fit(t.name || '我的旅行', 920, 64, true), 80, 190, 64, C.ink, true);
+    var sub = [t.destination, t.startDate && t.endDate ? md(t.startDate) + ' – ' + md(t.endDate) : '', tripDays(t) ? tripDays(t) + ' 天' : '', S.n > 1 ? S.n + ' 人' : ''].filter(Boolean).join('・');
+    tx(fit(sub, 920, 30), 80, 240, 30, C.sub);
+    // 總花費
+    rr(60, 280, W - 120, 260, 28, C.card);
+    tx('這趟旅行總共花了', 100, 345, 30, C.sub);
+    tx(money(S.total), 100, 440, 84, C.main, true);
+    var bt = t.totalBudget;
+    if (bt) {
+      var d = bt - S.total;
+      tx(d >= 0 ? '比預算省下 ' + money(d) : '超出預算 ' + money(-d), 100, 500, 32, d >= 0 ? C.pos : C.neg, true);
+    } else tx('共 ' + S.count + ' 筆花費', 100, 500, 30, C.sub);
+    // 三格
+    var boxes = [['平均每天', money(S.trip / S.days)], ['平均每人', money(S.total / S.n)], [S.topDay ? '花最多的一天（' + md(S.topDay[0]) + '）' : '花最多的一天', S.topDay ? money(S.topDay[1]) : '—']];
+    boxes.forEach(function (b, i) {
+      var x = 60 + i * 326, w = 306; rr(x, 570, w, 150, 24, C.card);
+      tx(fit(b[0], w - 30, 26), x + w / 2, 625, 26, C.sub, false, 'center');
+      tx(fit(b[1], w - 30, 36, true), x + w / 2, 685, 36, C.ink, true, 'center');
+    });
+    // 類別
+    rr(60, 750, W - 120, 330, 28, C.card);
+    tx('錢都花在哪裡', 100, 810, 32, C.ink, true);
+    var cats = S.cats.slice(0, 4), mx = cats.length ? cats[0][1] : 1;
+    cats.forEach(function (cRow, i) {
+      var y = 860 + i * 52;
+      tx(fit(cRow[0], 200, 28), 100, y + 22, 28, C.ink);
+      rr(320, y, 470 * Math.max(.03, cRow[1] / mx), 28, 14, i === 0 ? C.bar : C.bar2);
+      tx(Math.round(cRow[1] / (S.total || 1) * 100) + '%', 980, y + 22, 26, C.sub, true, 'right');
+    });
+    // 前三大
+    rr(60, 1110, W - 120, 150, 28, C.card);
+    tx('最大筆的花費', 100, 1160, 28, C.ink, true);
+    tx(fit(S.top.map(function (e) { return e.item + ' ' + money(e.amount); }).join('　'), 880, 26), 100, 1215, 26, C.sub);
+    tx('☁️ Yun端・旅遊預算與花費管理', W / 2, 1310, 24, C.main, false, 'center');
+    return { canvas: c, S: S };
+  }
+  function openSummary() {
+    var t = T(), r = drawSummary(t), url = r.canvas.toDataURL('image/png');
+    $('sumImg').src = url;
+    $('sumImg').alt = (t.name || '這趟旅行') + '的花費總結：總共 ' + money(r.S.total) + '，平均每天 ' + money(r.S.trip / r.S.days) +
+      (r.S.cats[0] ? '，花最多的是' + r.S.cats[0][0] : '') + '。';
+    $('sumModal').hidden = false; $('sumClose').focus();
+    $('sumDl').onclick = function () {
+      r.canvas.toBlob(function (b) {
+        var u = URL.createObjectURL(b), a = document.createElement('a');
+        a.href = u; a.download = ((t.name || '旅行') + '_花費總結.png').replace(/[\\\/:*?"<>|]/g, '');
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 1000);
+      });
+    };
+  }
+  $('sumBtn').addEventListener('click', openSummary);
+  $('sumClose').addEventListener('click', function () { $('sumModal').hidden = true; $('sumBtn').focus(); });
+  $('sumModal').addEventListener('click', function (ev) { if (ev.target === $('sumModal')) $('sumModal').hidden = true; });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !$('sumModal').hidden) $('sumModal').hidden = true; });
+  $('quickGo').addEventListener('click', quickApply);
+  $('quickIn').addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); quickApply(); } });
+  $('liveRate').addEventListener('click', liveRateClick);
+  renderSumCard();
+
+  document.addEventListener('click', function (ev) {
+    var btn = ev.target.closest('button[data-act]');
+    if (!btn) return;
+    var t = T(), id = btn.dataset.id;
+    switch (btn.dataset.act) {
+      case 'edit': startEdit(id); break;
+      case 'copy': startCopy(id); break;
+      case 'del': deleteExp(id); break;
+      case 'settle':
+        if (!confirm('確認 ' + btn.dataset.from + ' 已經轉帳 ' + money(btn.dataset.amt) + ' 給 ' + btn.dataset.to + '？')) return;
+        t.settlements.push({ id: uid('s'), date: today(), from: btn.dataset.from, to: btn.dataset.to, amount: Number(btn.dataset.amt), createdAt: Date.now() });
+        save(); renderAll(); flash('settleSavedMsg');
+        break;
+      case 'delSettle':
+        if (!confirm('確定要刪除這筆結算紀錄嗎？')) return;
+        t.settlements = t.settlements.filter(function (s) { return s.id !== id; });
+        save(); renderAll(); flash('settleSavedMsg');
+        break;
+      case 'delContrib':
+        if (!confirm('確定要刪除這筆公費紀錄嗎？')) return;
+        t.contributions = t.contributions.filter(function (c) { return c.id !== id; });
+        save(); renderAll(); flash('poolSavedMsg');
+        break;
+      case 'proxyGot':
+        var pe = t.expenses.find(function (e) { return e.id === id; });
+        if (pe) { pe.proxyGot = !pe.proxyGot; save(); renderAll(); }
+        break;
+      case 'delFx':
+        if (!confirm('確定要刪除這筆換匯紀錄嗎？')) return;
+        t.exchanges = t.exchanges.filter(function (x) { return x.id !== id; });
+        save(); renderAll(); flash('fxSavedMsg');
+        break;
+      case 'switch': switchTrip(id); flash('tripSavedMsg', '✓ 已切換'); break;
+      case 'archive':
+        var tr = db.trips.find(function (x) { return x.id === id; });
+        if (tr) { tr.archived = !tr.archived; save(); renderAll(); flash('tripSavedMsg'); }
+        break;
+      case 'delTrip': deleteTrip(id); break;
+    }
+  });
+})();
+</script>
+</body>
+</html>
