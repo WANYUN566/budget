@@ -1564,7 +1564,7 @@
     var a = Number($('expAmount').value), r = Number($('expRate').value), unit = '1 ' + curName(cur);
     var src = { cash: '現金：使用你的換匯成本', preset: '旅行設定的預設匯率', last: '上次使用的匯率', manual: '自行輸入', live: '今天的參考匯率' }[rateSrc] || '';
     var lines = [];
-    if (r > 0) lines.push(esc(unit + ' = ' + num(r) + ' 新台幣' + (src ? '（' + src + '）' : '')));
+    if (r > 0 && rateSrc !== 'live') lines.push(esc(unit + ' = ' + num(r) + ' 新台幣' + (src ? '（' + src + '）' : '')));
     else lines.push(esc('匯率請填「' + unit + '可換多少新台幣」。'));
     if (pay === '信用卡') {
       var adj = cardAdjFor(t, cur, pay);
