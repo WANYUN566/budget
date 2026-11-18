@@ -3158,7 +3158,7 @@
   function readTextFile(f) {
     return f.arrayBuffer().then(function (buf) {
       var t = new TextDecoder('utf-8').decode(buf);
-      if ((t.match(/�/g) || []).length > 3) { try { t = new TextDecoder('big5').decode(buf); } catch (e) {} }
+      if ((t.match(/\uFFFD/g) || []).length > 3) { try { t = new TextDecoder('big5').decode(buf); } catch (e) {} }
       return t;
     });
   }
