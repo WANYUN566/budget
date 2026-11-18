@@ -1143,8 +1143,10 @@
       <details class="more pastebox" id="pasteBox">
         <summary>貼上整段行程（從備忘錄、LINE、Google 文件複製）</summary>
         <textarea id="planPaste" placeholder="例如：&#10;第一天&#10;淺草寺&#10;一蘭拉麵&#10;晴空塔 門票 3100 日圓&#10;第二天&#10;築地市場"></textarea>
-        <p class="hint">看到「第一天、Day 2、11/20」會自動分天；每一行是一個行程，有寫金額的會一起帶入。整理完可以先修改再加入。</p>
-        <div class="actions"><button type="button" class="small" id="planParse">整理</button><button type="button" class="small secondary" id="planPasteClear">清空</button></div>
+        <p class="hint">看到「第一天、Day 2、11/20」會自動分天；每一行是一個行程，有寫金額的會一起帶入。整理完可以先修改再加入。也可以匯入 PDF 或文字檔（.txt），行程規劃助手下載的文字檔可以直接匯入。</p>
+        <div class="actions"><button type="button" class="small" id="planParse">整理</button><button type="button" class="small secondary" id="planFileBtn">匯入檔案（PDF、文字檔）</button><button type="button" class="small secondary" id="planPasteClear">清空</button></div>
+        <input type="file" id="planFile" accept=".txt,.text,.md,.csv,.pdf,text/plain,text/markdown,text/csv,application/pdf" hidden>
+        <p class="hint" id="planFileMsg" aria-live="polite"></p>
         <div id="planPreview"></div>
       </details>
       <div id="planList"></div>
@@ -2999,7 +3001,7 @@
 
 
   // ---------- 我的行程 ----------
-  var PLAN_CAT = [['餐飲', /豆腐|料理|丼|鍋|燒|串|定食|食堂|餐廳|小館|屋台|甜品|豆花|咖哩|披薩|漢堡/], ['購物', /市場|商店街|百貨|outlet|藥妝|伴手禮/i], ['景點門票', /稻荷|祇園|夜市|寺|神社|神宮|大社|廟|宮|教堂|城|塔|館|園|樂園|動物園|水族|展望|觀景|SKY|樓|老街|古蹟|遺跡|瀑布|峽|步道|山|湖|潭|海灘|溫泉|纜車|觀光|景點|遊樂|展覽|門票/i]];
+  var PLAN_CAT = [['餐飲', /湯|小籠|包子|蔘雞|參雞|豆腐|料理|丼|鍋|燒|串|定食|食堂|餐廳|小館|屋台|甜品|豆花|咖哩|披薩|漢堡/], ['購物', /市場|商店街|百貨|outlet|藥妝|伴手禮/i], ['景點門票', /稻荷|祇園|夜市|寺|神社|神宮|大社|廟|宮|教堂|城|塔|館|園|樂園|動物園|水族|展望|觀景|SKY|樓|老街|古蹟|遺跡|瀑布|峽|步道|山|湖|潭|海灘|溫泉|纜車|觀光|景點|遊樂|展覽|門票/i]];
   var pendingPlan = [], planAddOpen = 0;
   function planCatOf(name) {
     var c = quickParse(name).cat;
@@ -3017,9 +3019,15 @@
   }
   function parsePlan(text) {
     var out = [], day = 1, seenHeader = false, lastDate = '';
-    String(text || '').split(/\r?\n/).forEach(function (raw) {
-      var line = raw.replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).trim();
+    var src = String(text || ''), yun = /^\s*旅遊行程｜/m.test(src) && /【第\s*\d+\s*天】/.test(src);
+    src.split(/\r?\n/).forEach(function (raw) {
+      if (yun && /^\s{3,}/.test(raw)) return; // 行程規劃助手的說明行
+      var line = raw.replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).replace(/^\uFEFF/, '').trim();
       if (!line) return;
+      if (/^(旅遊行程｜|注意：|※|我的提醒：)/.test(line) || /｜預算：/.test(line) || /(\d+|[一二三四五六七八九十兩])\s*天\s*(\d+|[一二三四五六七八九十兩])\s*夜|日遊$|行程表?$|旅遊計畫$/.test(line.replace(/\s/g, ''))) return;
+      line = line.replace(/^【\s*(第\s*[一二三四五六七八九十兩\d]+\s*[天日])\s*】/, '$1');
+      var tagCat = '', tg = line.match(/^(\d{1,2}[:：]\d{2}\s*)?【(景點|午餐|晚餐|早餐|點心|美食|用餐|住宿|交通|購物)】/);
+      if (tg) { tagCat = ({ 景點: '景點門票', 住宿: '住宿', 交通: '交通', 購物: '購物' })[tg[2]] || '餐飲'; line = line.replace(/【[^】]{1,4}】/, ' '); }
       var m = line.match(/^(?:第\s*([一二三四五六七八九十兩\d]+)\s*[天日]|d(?:ay)?\s*\.?\s*(\d+))\s*[:：、.\-–—]?\s*(.*)$/i);
       var dm = !m && line.match(/^(\d{1,2})\s*[\/月.]\s*(\d{1,2})\s*日?(?:\s*[（(][^)）]*[)）])?\s*[:：、\-–—]?\s*(.*)$/);
       if (m) {
@@ -3037,12 +3045,12 @@
       line.split(/\s*(?:→|->|➜|⇒)\s*/).forEach(function (part) {
         part = part.trim(); if (!part) return;
         var q = quickParse(part);
-        var money0 = Q_CUR.some(function (c) { return c[0].test(part); }) || /\d\s*(元|塊|円)/.test(part) || /\d[\d,.]*\s*(萬|千|k)?\s*$/i.test(part);
+        var money0 = Q_CUR.some(function (c) { return c[0].test(part); }) || /\d\s*(元|塊|円)/.test(part) || /\s\d[\d,.]*\s*(萬|千|k)?\s*$/i.test(part);
         if (!money0) { q.amount = 0; q.cur = ''; }
         var name = q.amount > 0 ? (q.item || part) : part;
-        name = name.replace(/\s+/g, ' ').trim();
+        name = name.replace(/（(自己加的|非店名)）/g, '').replace(yun ? /（[^（）]{1,12}）$/ : /$^/, '').replace(/\s+/g, ' ').trim();
         if (!name) return;
-        out.push({ id: uid('p'), day: day, name: name, cat: planCatOf(name), amt: q.amount > 0 ? q.amount : 0, cur: q.amount > 0 ? (q.cur || T().lastCurrency || 'TWD') : (T().lastCurrency || 'TWD') });
+        out.push({ id: uid('p'), day: day, name: name, cat: tagCat || planCatOf(name), amt: q.amount > 0 ? q.amount : 0, cur: q.amount > 0 ? (q.cur || T().lastCurrency || 'TWD') : (T().lastCurrency || 'TWD') });
       });
     });
     return out;
@@ -3116,12 +3124,76 @@
       }).join('') +
       '<div class="actions" style="margin:10px 0 8px"><button type="button" class="small" id="planAccept">加入我的行程</button></div></div>';
   }
+
+  // ---------- 匯入 PDF、文字檔 ----------
+  var PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+  function loadPdfJs() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    return new Promise(function (ok, bad) {
+      var sc = document.createElement('script'); sc.src = PDFJS + 'pdf.min.js';
+      sc.onload = function () { if (window.pdfjsLib) { window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js'; ok(window.pdfjsLib); } else bad(new Error('load')); };
+      sc.onerror = function () { bad(new Error('load')); };
+      document.head.appendChild(sc);
+    });
+  }
+  function pdfText(buf) {
+    return loadPdfJs().then(function (lib) { return lib.getDocument({ data: buf }).promise; }).then(function (doc) {
+      var pages = [];
+      for (var i = 1; i <= Math.min(doc.numPages, 30); i++) pages.push(doc.getPage(i).then(function (pg) { return pg.getTextContent(); }));
+      return Promise.all(pages).then(function (cs) {
+        return cs.map(function (c) {
+          var rows = [];
+          c.items.forEach(function (it) {
+            if (!it.str || !it.str.trim()) { if (it.hasEOL && rows.length) rows[rows.length - 1].eol = true; return; }
+            var y = Math.round(it.transform[5]), x = it.transform[4], r = rows.find(function (q) { return Math.abs(q.y - y) <= 3; });
+            if (!r) { r = { y: y, parts: [] }; rows.push(r); }
+            r.parts.push({ x: x, w: it.width || 0, s: it.str });
+          });
+          rows.sort(function (a, b) { return b.y - a.y; });
+          return rows.map(function (r) { var ps = r.parts.sort(function (a, b) { return a.x - b.x; }), out = ''; ps.forEach(function (q, i) { if (i) { var pr = ps[i - 1]; out += (q.x - (pr.x + pr.w) > 3 ? ' ' : ''); } out += q.s; }); return out.replace(/\s+/g, ' ').trim(); }).join('\n');
+        }).join('\n');
+      });
+    });
+  }
+  function readTextFile(f) {
+    return f.arrayBuffer().then(function (buf) {
+      var t = new TextDecoder('utf-8').decode(buf);
+      if ((t.match(/�/g) || []).length > 3) { try { t = new TextDecoder('big5').decode(buf); } catch (e) {} }
+      return t;
+    });
+  }
+  $('planFileBtn').addEventListener('click', function () { $('planFile').click(); });
+  $('planFile').addEventListener('change', function () {
+    var f = this.files && this.files[0], msg = $('planFileMsg'); this.value = '';
+    if (!f) return;
+    if (f.size > 15 * 1024 * 1024) { msg.className = 'hint warn'; msg.textContent = '檔案太大了（超過 15MB），請改用文字檔或直接貼上。'; return; }
+    var isPdf = /\.pdf$/i.test(f.name) || f.type === 'application/pdf';
+    msg.className = 'hint'; msg.textContent = '讀取中…';
+    var job = isPdf ? (navigator.onLine === false ? Promise.reject(new Error('offline')) : f.arrayBuffer().then(pdfText)) : readTextFile(f);
+    job.then(function (t) {
+      t = String(t || '').trim();
+      if (!t) {
+        msg.className = 'hint warn';
+        msg.textContent = isPdf ? '這個 PDF 讀不到文字，可能是用圖片做的（例如行程規劃助手下載的 PDF）。請改用文字檔，或把行程複製貼上。' : '檔案裡沒有文字。';
+        return;
+      }
+      $('planPaste').value = t.slice(0, 20000);
+      pendingPlan = parsePlan($('planPaste').value);
+      renderPreview();
+      msg.className = 'hint' + (pendingPlan.length ? '' : ' warn');
+      msg.textContent = pendingPlan.length ? '已讀取「' + f.name + '」，整理出 ' + pendingPlan.length + ' 個行程，請在下面確認。上面的文字也可以修改後再按「整理」。' : '已讀取「' + f.name + '」，但沒有整理出行程。可以在上面的文字框修改後再按「整理」。';
+    }).catch(function (e) {
+      msg.className = 'hint warn';
+      msg.textContent = isPdf ? (e && e.message === 'offline' ? '讀取 PDF 需要網路，請連上網路再試，或改用文字檔。' : '這個 PDF 讀取失敗（可能有密碼保護或檔案損壞），請改用文字檔，或把行程複製貼上。') : '讀取檔案失敗，請再試一次。';
+    });
+  });
+
   $('planParse').addEventListener('click', function () {
     pendingPlan = parsePlan($('planPaste').value);
     if (!pendingPlan.length) { $('planPreview').innerHTML = '<p class="hint warn">沒有整理出行程，請確認每一行是一個地點或店名。</p>'; return; }
     renderPreview();
   });
-  $('planPasteClear').addEventListener('click', function () { $('planPaste').value = ''; pendingPlan = []; renderPreview(); });
+  $('planPasteClear').addEventListener('click', function () { $('planPaste').value = ''; pendingPlan = []; renderPreview(); $('planFileMsg').textContent = ''; });
   $('planPreview').addEventListener('change', function (ev) {
     var el = ev.target, i = Number(el.dataset.i); if (!pendingPlan[i]) return;
     if (el.dataset.pp === 'cat') { pendingPlan[i].cat = el.value; renderPreview(); }
