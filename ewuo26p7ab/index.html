@@ -601,6 +601,9 @@
   }
   .bkinfo { margin-top: 10px; font-size: .9rem; border-radius: 12px; padding: 8px 12px; background: var(--soft); border: 1px solid var(--line); }
   .bkinfo.old { background: var(--wn-bg); border-color: var(--warn-line); }
+  .pmeta { border: 1px solid var(--milktea); border-radius: 14px; padding: 10px 12px; margin: 6px 0 10px; background: var(--paper); }
+  .pmeta .chk { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--caramel); margin: 0 0 6px; }
+  .pmeta .chk input { width: 20px; height: 20px; }
   /* 提醒橫幅 */
   .banner { border-left: 5px solid var(--caramel); }
   .banner.warnb { border-left-color: var(--brick); background: #FFF4F5; }
@@ -3126,7 +3129,7 @@
 
   // ---------- 我的行程 ----------
   var PLAN_CAT = [['餐飲', /湯|小籠|包子|蔘雞|參雞|豆腐|料理|丼|鍋|燒|串|定食|食堂|餐廳|小館|屋台|甜品|豆花|咖哩|披薩|漢堡/], ['購物', /市場|商店街|百貨|outlet|藥妝|伴手禮/i], ['景點門票', /稻荷|祇園|夜市|寺|神社|神宮|大社|廟|宮|教堂|城|塔|館|園|樂園|動物園|水族|展望|觀景|SKY|樓|老街|古蹟|遺跡|瀑布|峽|步道|山|湖|潭|海灘|溫泉|纜車|觀光|景點|遊樂|展覽|門票/i]];
-  var pendingPlan = [], planAddOpen = 0;
+  var pendingPlan = [], pendingMeta = null, planAddOpen = 0;
   function planCatOf(name) {
     var c = quickParse(name).cat;
     if (c) return c;
@@ -3144,8 +3147,13 @@
   function parsePlan(text) {
     var out = [], day = 1, seenHeader = false, lastDate = '';
     var src = String(text || ''), yun = /^\s*旅遊行程｜/m.test(src) && /【第\s*\d+\s*天】/.test(src);
+    var yunPpl = yun ? (Number((src.match(/共\s*(\d+)\s*人/) || [])[1]) || 1) : 1;
     src.split(/\r?\n/).forEach(function (raw) {
-      if (yun && /^\s{3,}/.test(raw)) return; // 行程規劃助手的說明行
+      if (yun && /^\s{3,}/.test(raw)) { // 行程規劃助手的說明行：只抓「每人約 NT$…」當預估金額
+        var em = raw.match(/每人約\s*NT\$\s*([\d,]+)(?:\s*[–\-~～]\s*([\d,]+))?/), lastIt = out[out.length - 1];
+        if (em && lastIt && !(lastIt.amt > 0)) { lastIt.amt = Number((em[2] || em[1]).replace(/,/g, '')) * yunPpl; lastIt.cur = 'TWD'; lastIt.est = 1; }
+        return;
+      }
       var line = raw.replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).replace(/^\uFEFF/, '').trim();
       if (!line) return;
       if (/^(旅遊行程｜|注意：|※|我的提醒：)/.test(line) || /｜預算：/.test(line) || /(\d+|[一二三四五六七八九十兩])\s*天\s*(\d+|[一二三四五六七八九十兩])\s*夜|日遊$|行程表?$|旅遊計畫$/.test(line.replace(/\s/g, ''))) return;
@@ -3178,6 +3186,22 @@
       });
     });
     return out;
+  }
+  function planMeta(text, items) {
+    var src = String(text || '').replace(/^﻿/, ''), m = {}, h;
+    if ((h = src.match(/^\s*旅遊行程｜\s*(.+?)\s+(\d+)\s*天\s*$/m))) { m.dest = h[1].trim(); m.days = Number(h[2]); m.name = h[1].trim() + ' ' + h[2] + ' 天'; }
+    if ((h = src.match(/共\s*(\d+)\s*人/))) m.ppl = Number(h[1]);
+    var y = src.match(/(20\d{2})\s*[\/.\-年]\s*(\d{1,2})\s*[\/.\-月]\s*(\d{1,2})/);
+    if (y) m.start = y[1] + '-' + ('0' + y[2]).slice(-2) + '-' + ('0' + y[3]).slice(-2);
+    else if ((y = src.match(/^\s*(?:【\s*)?(\d{1,2})\s*[\/月]\s*(\d{1,2})\s*日?/m))) {
+      var td = today(), yr = Number(td.slice(0, 4)), cand = yr + '-' + ('0' + y[1]).slice(-2) + '-' + ('0' + y[2]).slice(-2);
+      if (cand < td && dayDiff(cand, td) > 60) cand = (yr + 1) + cand.slice(4);
+      m.start = cand;
+    }
+    var mx = (items || []).reduce(function (a, x) { return Math.max(a, x.day); }, 0);
+    if (!m.days && mx) m.days = mx;
+    if (!m.dest) { var t0 = src.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean)[0] || ''; var g = t0.match(/^(.{1,12}?)\s*(?:[一二三四五六七八九十兩\d]+\s*天|\d+\s*日遊|之旅|自由行|旅行|旅遊)/); if (g && !/^(第|day)/i.test(t0)) { m.dest = g[1].replace(/[｜|:：]/g, '').trim(); m.name = t0.slice(0, 20); } }
+    return m;
   }
   function planAmtText(x) { return x.amt > 0 ? '預估 ' + (x.cur === 'TWD' ? money(x.amt) : curName(x.cur) + ' ' + num(x.amt)) : ''; }
   function planTWD(t, x) { if (!(x.amt > 0)) return 0; if (x.cur === 'TWD') return x.amt; var r = curRate(t, x.cur); return r ? x.amt * r : 0; }
@@ -3240,7 +3264,19 @@
     var box = $('planPreview');
     if (!pendingPlan.length) { box.innerHTML = ''; return; }
     var days = {}; pendingPlan.forEach(function (x) { days[x.day] = 1; });
-    box.innerHTML = '<div class="ppre"><p class="hint" style="margin:6px 0">整理出 ' + Object.keys(days).length + ' 天、' + pendingPlan.length + ' 個行程。類別是自動判斷的，不對可以改；不要的可以刪掉。</p>' +
+    var t0 = T(), M = pendingMeta || {}, metaH = '';
+    if (M.name || M.dest || M.ppl || M.start) {
+      var st = M.start || t0.startDate || '';
+      metaH = '<div class="pmeta"><label class="chk"><input type="checkbox" id="pmUse" checked> 同時填入「旅遊預算設定」</label>' +
+        '<div class="grid">' +
+        '<div><label for="pmName">旅遊名稱</label><input id="pmName" type="text" value="' + esc(M.name || t0.name || '') + '"></div>' +
+        '<div><label for="pmDest">目的地</label><input id="pmDest" type="text" value="' + esc(M.dest || t0.destination || '') + '"></div>' +
+        '<div><label for="pmStart">出發日期' + (M.start ? '' : '（檔案裡沒有，請選）') + '</label><input id="pmStart" type="date" value="' + esc(st) + '"></div>' +
+        '<div><label for="pmDays">天數</label><input id="pmDays" type="number" min="1" max="60" inputmode="numeric" value="' + (M.days || '') + '"></div>' +
+        '<div><label for="pmPpl">人數</label><input id="pmPpl" type="number" min="1" inputmode="numeric" value="' + (M.ppl || t0.travelers || '') + '"></div>' +
+        '</div><p class="hint" id="pmHint" style="margin:6px 0 0"></p></div>';
+    }
+    box.innerHTML = '<div class="ppre">' + metaH + '<p class="hint" style="margin:6px 0">整理出 ' + Object.keys(days).length + ' 天、' + pendingPlan.length + ' 個行程。類別是自動判斷的，不對可以改；不要的可以刪掉。' + (pendingPlan.some(function (x) { return x.est; }) ? '金額是行程規劃助手的每人預估 × 人數（取上限），只當參考。' : '') + '</p>' +
       pendingPlan.map(function (x, i) {
         return '<div class="pitem"><span class="pic">' + catIcon(x.cat) + '</span><div class="pn"><input type="text" data-pp="name" data-i="' + i + '" value="' + esc(x.name) + '" aria-label="行程名稱"><span>第 ' + x.day + ' 天' + (x.amt > 0 ? '・' + esc(planAmtText(x)) : '') + '</span></div>' +
           '<select data-pp="cat" data-i="' + i + '" aria-label="類別">' + CATEGORIES.map(function (c) { return '<option' + (c === x.cat ? ' selected' : '') + '>' + c + '</option>'; }).join('') + '</select>' +
@@ -3303,7 +3339,8 @@
         return;
       }
       $('planPaste').value = t.slice(0, 20000);
-      pendingPlan = parsePlan($('planPaste').value);
+      $('pasteBox').open = true;
+      pendingPlan = parsePlan($('planPaste').value); pendingMeta = planMeta($('planPaste').value, pendingPlan);
       renderPreview();
       msg.className = 'hint' + (pendingPlan.length ? '' : ' warn');
       msg.textContent = pendingPlan.length ? '已讀取「' + f.name + '」，整理出 ' + pendingPlan.length + ' 個行程，請在下面確認。上面的文字也可以修改後再按「整理」。' : '已讀取「' + f.name + '」，但沒有整理出行程。可以在上面的文字框修改後再按「整理」。';
@@ -3314,24 +3351,38 @@
   });
 
   $('planParse').addEventListener('click', function () {
-    pendingPlan = parsePlan($('planPaste').value);
+    pendingPlan = parsePlan($('planPaste').value); pendingMeta = planMeta($('planPaste').value, pendingPlan);
     if (!pendingPlan.length) { $('planPreview').innerHTML = '<p class="hint warn">沒有整理出行程，請確認每一行是一個地點或店名。</p>'; return; }
     renderPreview();
   });
-  $('planPasteClear').addEventListener('click', function () { $('planPaste').value = ''; pendingPlan = []; renderPreview(); $('planFileMsg').textContent = ''; });
+  $('planPasteClear').addEventListener('click', function () { $('planPaste').value = ''; pendingPlan = []; pendingMeta = null; renderPreview(); $('planFileMsg').textContent = ''; });
   $('planPreview').addEventListener('change', function (ev) {
     var el = ev.target, i = Number(el.dataset.i); if (!pendingPlan[i]) return;
     if (el.dataset.pp === 'cat') { pendingPlan[i].cat = el.value; renderPreview(); }
     if (el.dataset.pp === 'name') pendingPlan[i].name = el.value.trim() || pendingPlan[i].name;
   });
+  $('planPreview').addEventListener('input', function (ev) {
+    var id = ev.target.id, M = pendingMeta; if (!M || !/^pm/.test(id)) return;
+    if (id === 'pmName') M.name = ev.target.value; else if (id === 'pmDest') M.dest = ev.target.value; else if (id === 'pmStart') M.start = ev.target.value;
+    else if (id === 'pmDays') M.days = Number(ev.target.value) || 0; else if (id === 'pmPpl') M.ppl = Number(ev.target.value) || 0;
+  });
   $('planPreview').addEventListener('click', function (ev) {
     var b = ev.target.closest('button'); if (!b) return;
     if (b.dataset.pp === 'del') { pendingPlan.splice(Number(b.dataset.i), 1); renderPreview(); return; }
     if (b.id === 'planAccept') {
-      var t = T(); pendingPlan.forEach(function (x) { t.plan.push(x); });
-      var n = pendingPlan.length; pendingPlan = []; $('planPaste').value = ''; $('pasteBox').open = false;
-      save(); renderPreview(); renderPlan(); flash('tripSavedMsg', '✓ 已加入 ' + n + ' 個行程');
-      $('planSum').textContent = '✓ 已加入 ' + n + ' 個行程。' + $('planSum').textContent;
+      var t = T(), filled = [];
+      if ($('pmUse') && $('pmUse').checked) {
+        var nm = $('pmName').value.trim(), ds = $('pmDest').value.trim(), sd = $('pmStart').value, dn = Math.round(Number($('pmDays').value)) || 0, pp = Math.round(Number($('pmPpl').value)) || 0;
+        if (nm) { t.name = nm.slice(0, 40); filled.push('名稱'); }
+        if (ds) { t.destination = ds.slice(0, 40); filled.push('目的地'); }
+        if (sd) { t.startDate = sd; filled.push('出發日期'); if (dn > 0) { t.endDate = addDay(sd, dn - 1); filled.push('回程日期'); } }
+        if (pp > 0) { t.travelers = pp; filled.push('人數'); }
+        if (t.lastCurrency === 'TWD' && !t.expenses.length && typeof destCur === 'function') { var dc = destCur(t); if (dc) { t.lastCurrency = dc; filled.push('幣別'); } }
+      }
+      pendingPlan.forEach(function (x) { delete x.est; t.plan.push(x); });
+      var n = pendingPlan.length; pendingPlan = []; pendingMeta = null; $('planPaste').value = ''; $('pasteBox').open = false;
+      save(); fillTripForm(); renderAll(); renderPreview(); renderPlan(); flash('tripSavedMsg', '✓ 已加入 ' + n + ' 個行程');
+      $('planSum').textContent = '✓ 已加入 ' + n + ' 個行程' + (filled.length ? '，也填好了旅遊' + filled.join('、') : '') + '。' + (t.startDate ? '' : '出發日期還沒填，記得到下面「旅遊預算設定」補上。') + $('planSum').textContent;
     }
   });
   $('planList').addEventListener('click', function (ev) {
