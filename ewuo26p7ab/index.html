@@ -493,6 +493,36 @@
     .hic { transition: transform .3s; } .card:hover .hic { transform: rotate(-8deg) scale(1.08); }
     .today-v { animation: cardIn .6s ease-out .1s both; }
   }
+  /* 我的行程 */
+  .pday { border-top: 1px dashed var(--line); padding: 10px 0 4px; }
+  .pday:first-of-type { border-top: 0; }
+  .pday h3 { margin: 0 0 8px; font-size: .95rem; color: var(--caramel); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .pitem { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+  .pitem .pic { width: 34px; height: 34px; border-radius: 50%; background: var(--oat); color: var(--caramel); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pitem .pic .ic-c { width: 18px; height: 18px; }
+  .pitem .pn { flex: 1; min-width: 0; }
+  .pitem .pn b { display: block; font-weight: 600; overflow-wrap: anywhere; }
+  .pitem .pn span { font-size: .82rem; color: var(--muted); }
+  .pitem .done { font-size: .78rem; color: var(--sage-text); background: var(--sage-light); border-radius: 999px; padding: 1px 8px; margin-left: 4px; }
+  .padd { background: var(--oat); border-radius: 14px; padding: 12px; margin: 6px 0 4px; }
+  .padd .chips.cats { margin: 6px 0 8px; }
+  .padd .row2 { display: flex; gap: 8px; flex-wrap: wrap; }
+  .padd .row2 input { flex: 1 1 140px; }
+  .pastebox textarea { width: 100%; min-height: 150px; font-family: inherit; font-size: .95rem; padding: 10px 12px; border: 1px solid var(--milktea); border-radius: 12px; background: var(--paper); }
+  .ppre { margin-top: 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 6px 12px; }
+  .ppre .pitem { flex-wrap: wrap; row-gap: 6px; border-top: 1px dashed var(--line); }
+  .ppre .pitem:first-of-type { border-top: 0; }
+  .ppre .pitem .pn { flex: 1 1 calc(100% - 50px); }
+  .ppre .pitem .pn input { width: 100%; }
+  .ppre .pitem select { margin-left: 44px; flex: 1 1 auto; max-width: 180px;
+  }
+  .ppre .pitem select { width: auto; min-height: 36px; padding: 4px 8px; font-size: .85rem; }
+  .ppre .pitem input[type=text] { min-height: 36px; padding: 4px 8px; }
+  .psum { font-size: .88rem; color: var(--muted); margin: 8px 0 0; }
+  .todayplan { margin: 0 0 14px; }
+  .todayplan label { margin-top: 0; }
+  .todayplan .chip { min-height: 40px; }
+  .todayplan .chip.used { opacity: .55; }
   /* 提醒橫幅 */
   .banner { border-left: 5px solid var(--caramel); }
   .banner.warnb { border-left-color: var(--brick); background: #FFF4F5; }
@@ -543,6 +573,7 @@
     </filter>
     <symbol id="c0" viewBox="0 0 24 24"><path d="M21 4 3 11l7 3 3 7z"/><path d="M10 14 21 4"/></symbol><symbol id="c1" viewBox="0 0 24 24"><path d="M5 16v-4l2-5h10l2 5v4z"/><path d="M5 12h14"/><circle cx="8" cy="17.5" r="1.6"/><circle cx="16" cy="17.5" r="1.6"/></symbol><symbol id="c2" viewBox="0 0 24 24"><path d="M3 19V7"/><path d="M3 15h18v4"/><path d="M21 15v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="12" r="1.8"/></symbol><symbol id="c3" viewBox="0 0 24 24"><rect x="6" y="3.5" width="12" height="13" rx="3"/><path d="M6 10.5h12"/><circle cx="9" cy="13.5" r=".6"/><circle cx="15" cy="13.5" r=".6"/><path d="M8.5 20.5l2-4M15.5 20.5l-2-4"/></symbol><symbol id="c4" viewBox="0 0 24 24"><path d="M8 3 5 21M16 3l3 18"/><path d="M12 5v2M12 11v2M12 17v2"/></symbol><symbol id="c5" viewBox="0 0 24 24"><rect x="4" y="4" width="10" height="16" rx="1.5"/><path d="M4 10h10"/><path d="M14 8h2l2 2v7a1.5 1.5 0 0 0 3 0V9l-3-3"/></symbol><symbol id="c6" viewBox="0 0 24 24"><path d="M4 12h16a8 8 0 0 1-16 0z"/><path d="M14 3l4 7M17 3l2 6"/><path d="M8 20h8"/></symbol><symbol id="c7" viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol><symbol id="c8" viewBox="0 0 24 24"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10" stroke-dasharray="1.5 2"/></symbol><symbol id="c9" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="8.5" cy="12" r=".7"/><circle cx="12" cy="12" r=".7"/><circle cx="15.5" cy="12" r=".7"/></symbol><symbol id="p0" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2.4"/><path d="M6 10v4M18 10v4"/></symbol><symbol id="p1" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/></symbol><symbol id="p2" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/></symbol><symbol id="p3" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/></symbol><symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M5 7l9-3.5 2 3.5"/><rect x="14" y="11.5" width="7" height="5" rx="2.5"/></symbol><symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/></symbol>
     <symbol id="h-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></symbol><symbol id="h-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></symbol><symbol id="h-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol><symbol id="h-gift" viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-2-4-6-4-6-1.5S9 9 12 9c3 0 6 .5 6-1.5S14 5 12 9z"/></symbol><symbol id="h-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol><symbol id="h-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="7" rx="5" ry="2.2"/><path d="M4 7v4c0 1.2 2.2 2.2 5 2.2s5-1 5-2.2V7"/><ellipse cx="15" cy="14" rx="5" ry="2.2"/><path d="M10 14v3.5c0 1.2 2.2 2.2 5 2.2s5-1 5-2.2V14"/></symbol><symbol id="h-flag" viewBox="0 0 24 24"><path d="M6 21V4"/><path d="M6 4h11l-2 4 2 4H6"/></symbol><symbol id="h-map" viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></symbol><symbol id="h-cloud" viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 17 8.5a3.8 3.8 0 0 1 .5 7.5z"/><path d="M12 15V10M9.5 12.5 12 10l2.5 2.5"/></symbol><symbol id="h-chart" viewBox="0 0 24 24"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="7" rx=".8"/><rect x="11" y="7" width="3" height="11" rx=".8"/><rect x="16" y="13" width="3" height="5" rx=".8"/></symbol>
+    <symbol id="h-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="6" r="2.2"/><path d="M8 18h6a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h6"/></symbol>
     <symbol id="i-overview" viewBox="0 0 24 24">
       <g filter="url(#pencil)">
         <path d="M3.5 3.4 L3.3 20.8 M3.2 20.6 L20.9 20.3"/>
@@ -744,6 +775,10 @@
     <div class="card noprint" id="expFormCard">
       <h2 data-kicker="NEW ENTRY" id="formTitle">新增一筆花費</h2>
       <p class="step">每次有新的支出，就在這裡新增一筆，系統會自動更新花費統計。</p>
+      <div class="todayplan" id="todayPlan" hidden>
+        <label id="lbTodayPlan">今天的行程（點一下自動填好）</label>
+        <div class="chips" id="todayPlanChips" role="group" aria-labelledby="lbTodayPlan"></div>
+      </div>
       <div class="qin">
         <label for="quickIn">快速輸入</label>
         <div class="qrow"><input id="quickIn" type="text" autocomplete="off" placeholder="例如：拉麵 1200 日圓 刷卡"><button type="button" class="small secondary" id="quickGo">帶入</button></div>
@@ -1102,6 +1137,21 @@
       <div class="actions"><button type="button" class="small assist" id="demoBtn">先看範例旅行</button><button type="button" class="small secondary" id="guideHide">不用再顯示</button></div>
       <p class="hint" style="margin-bottom:0">範例會另外建立一趟「範例旅行」，不會動到你的資料，看完可以在下方「我的旅行」刪除。</p>
     </div>
+    <div class="card noprint" id="planCard">
+      <h2 data-kicker="MY ITINERARY">我的行程（選填）</h2>
+      <p class="hint" style="margin-top:0">把排好的行程放進來，記帳時點一下店名就能自動填好項目和類別。行程是從哪裡來的都可以。</p>
+      <details class="more pastebox" id="pasteBox">
+        <summary>貼上整段行程（從備忘錄、LINE、Google 文件複製）</summary>
+        <textarea id="planPaste" placeholder="例如：&#10;第一天&#10;淺草寺&#10;一蘭拉麵&#10;晴空塔 門票 3100 日圓&#10;第二天&#10;築地市場"></textarea>
+        <p class="hint">看到「第一天、Day 2、11/20」會自動分天；每一行是一個行程，有寫金額的會一起帶入。整理完可以先修改再加入。</p>
+        <div class="actions"><button type="button" class="small" id="planParse">整理</button><button type="button" class="small secondary" id="planPasteClear">清空</button></div>
+        <div id="planPreview"></div>
+      </details>
+      <div id="planList"></div>
+      <div class="actions"><button type="button" class="small secondary" id="planAddDay">＋ 新增一天</button><button type="button" class="small secondary" id="planBudget" hidden>用預估金額設定類別預算</button><button type="button" class="small danger" id="planClear" hidden>清空行程</button></div>
+      <p class="psum" id="planSum"></p>
+    </div>
+
     <div class="card">
       <h2 data-kicker="TRIP PLAN">旅遊預算設定</h2>
       <p class="step">第一步：先設定這趟旅行的總預算與各項預算，完成後按下儲存，再開始記錄旅途中的花費。</p>
@@ -1330,7 +1380,7 @@
       travelers: 0, totalBudget: 0, reserve: 0, catBudgets: cb, dailyLimit: 0, alertPct: 80, presetRates: {},
       cardFee: 1.5, cashback: 0, tripBudget: 0, poolAlert: 0, displayCur: '', contributions: [],
       note: '', archived: false, members: [], rates: {}, lastCurrency: 'TWD',
-      expenses: [], exchanges: [], settlements: [], createdAt: Date.now()
+      expenses: [], exchanges: [], settlements: [], plan: [], createdAt: Date.now()
     };
   }
   function normTrip(d) {
@@ -1357,6 +1407,9 @@
     t.exchanges = Array.isArray(d.exchanges) ? d.exchanges : [];
     t.settlements = Array.isArray(d.settlements) ? d.settlements : [];
     t.contributions = Array.isArray(d.contributions) ? d.contributions : [];
+    t.plan = Array.isArray(d.plan) ? d.plan.filter(function (x) { return x && x.name; }).map(function (x) {
+      return { id: String(x.id || uid('p')), day: Math.max(1, Math.round(Number(x.day)) || 1), name: String(x.name).slice(0, 60), cat: CATEGORIES.indexOf(x.cat) >= 0 ? x.cat : '其他', amt: toNum(x.amt), cur: validCur(x.cur) ? x.cur : 'TWD' };
+    }) : [];
     t.cardFee = (d.cardFee !== undefined && d.cardFee !== '' && isFinite(Number(d.cardFee)) && Number(d.cardFee) >= 0) ? Number(d.cardFee) : 1.5;
     t.cashback = toNum(d.cashback);
     t.tripBudget = toNum(d.tripBudget);
@@ -1834,6 +1887,7 @@
     $('formTitle').textContent = '新增一筆花費';
     $('submitExp').textContent = '新增花費';
     $('cancelEdit').style.display = 'none';
+    if (typeof renderTodayPlan === 'function') renderTodayPlan();
   }
 
   function fillForm(e) {
@@ -2461,6 +2515,7 @@
       t.totalBudget = copyFrom.totalBudget; t.reserve = copyFrom.reserve; t.travelers = copyFrom.travelers;
       t.dailyLimit = copyFrom.dailyLimit; t.alertPct = copyFrom.alertPct; t.destination = copyFrom.destination; t.presetRates = JSON.parse(JSON.stringify(copyFrom.presetRates));
       t.cardFee = copyFrom.cardFee; t.cashback = copyFrom.cashback; t.tripBudget = copyFrom.tripBudget; t.poolAlert = copyFrom.poolAlert;
+      t.plan = (copyFrom.plan || []).map(function (x) { return Object.assign({}, x, { id: uid('p') }); });
       t.members = copyFrom.members.slice(); t.rates = JSON.parse(JSON.stringify(copyFrom.rates)); t.lastCurrency = copyFrom.lastCurrency;
       CATEGORIES.forEach(function (c) { t.catBudgets[c] = copyFrom.catBudgets[c]; });
     }
@@ -2538,6 +2593,7 @@
     if (typeof renderSumCard === 'function' && $('sumCard')) renderSumCard();
     if (typeof renderNotes === 'function' && $('bkBanner')) renderNotes();
     if (typeof syncOther === 'function' && $('cMemberChips')) syncOther();
+    if (typeof renderPlan === 'function' && $('planList')) renderPlan();
     renderTrips();
     renderItemList();
     renderQuickAmts();
@@ -2893,7 +2949,7 @@
   // ---------- 其他頁面的按鈕、標題圖示 ----------
   var HICON = { 'TODAY': 'h-sun', 'TRIP SUMMARY': 'h-spark', 'NOTES': 'h-bell', 'SUMMARY': 'h-chart', 'DAILY SPENDING': 'i-cal', 'FOR OTHERS': 'h-gift',
     'NEW ENTRY': 'i-add', 'RECORDS': 'i-list', 'SETTLEMENT': 'i-split', 'SHARED WALLET': 'i-wallet', 'HISTORY': 'h-clock', 'EXCHANGE': 'i-fx',
-    'CURRENCIES': 'h-coins', 'EXCHANGE LOG': 'h-clock', 'START': 'h-flag', 'TRIP PLAN': 'i-trip', 'MY JOURNEYS': 'h-map', 'BACKUP': 'h-cloud', 'HOME SCREEN': 'i-phone' };
+    'CURRENCIES': 'h-coins', 'EXCHANGE LOG': 'h-clock', 'START': 'h-flag', 'TRIP PLAN': 'i-trip', 'MY JOURNEYS': 'h-map', 'MY ITINERARY': 'h-route', 'BACKUP': 'h-cloud', 'HOME SCREEN': 'i-phone' };
   Array.prototype.forEach.call(document.querySelectorAll('h2[data-kicker]'), function (h) {
     var id = HICON[h.dataset.kicker]; if (!id || h.querySelector('.hic')) return;
     h.insertAdjacentHTML('afterbegin', '<span class="hic" aria-hidden="true"><svg><use href="#' + id + '"/></svg></span>');
@@ -2940,6 +2996,179 @@
   $('cCur').addEventListener('change', syncOther);
   $('fxCur').addEventListener('change', syncOther);
   syncOther();
+
+
+  // ---------- 我的行程 ----------
+  var PLAN_CAT = [['餐飲', /豆腐|料理|丼|鍋|燒|串|定食|食堂|餐廳|小館|屋台|甜品|豆花|咖哩|披薩|漢堡/], ['購物', /市場|商店街|百貨|outlet|藥妝|伴手禮/i], ['景點門票', /稻荷|祇園|夜市|寺|神社|神宮|大社|廟|宮|教堂|城|塔|館|園|樂園|動物園|水族|展望|觀景|SKY|樓|老街|古蹟|遺跡|瀑布|峽|步道|山|湖|潭|海灘|溫泉|纜車|觀光|景點|遊樂|展覽|門票/i]];
+  var pendingPlan = [], planAddOpen = 0;
+  function planCatOf(name) {
+    var c = quickParse(name).cat;
+    if (c) return c;
+    for (var i = 0; i < PLAN_CAT.length; i++) if (PLAN_CAT[i][1].test(name)) return PLAN_CAT[i][0];
+    return '其他';
+  }
+  var CN_NUM = { '一': 1, '二': 2, '兩': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10 };
+  function cnToNum(s) {
+    if (/^\d+$/.test(s)) return Number(s);
+    if (s === '十') return 10;
+    var m = s.match(/^([一二三四五六七八九])?十([一二三四五六七八九])?$/);
+    if (m) return (m[1] ? CN_NUM[m[1]] : 1) * 10 + (m[2] ? CN_NUM[m[2]] : 0);
+    return CN_NUM[s] || 0;
+  }
+  function parsePlan(text) {
+    var out = [], day = 1, seenHeader = false, lastDate = '';
+    String(text || '').split(/\r?\n/).forEach(function (raw) {
+      var line = raw.replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).trim();
+      if (!line) return;
+      var m = line.match(/^(?:第\s*([一二三四五六七八九十兩\d]+)\s*[天日]|d(?:ay)?\s*\.?\s*(\d+))\s*[:：、.\-–—]?\s*(.*)$/i);
+      var dm = !m && line.match(/^(\d{1,2})\s*[\/月.]\s*(\d{1,2})\s*日?(?:\s*[（(][^)）]*[)）])?\s*[:：、\-–—]?\s*(.*)$/);
+      if (m) {
+        var n = cnToNum(m[1] || m[2]);
+        day = n > 0 ? n : (seenHeader ? day + 1 : 1); seenHeader = true;
+        line = m[3] || '';
+      } else if (dm) {
+        var key = dm[1] + '/' + dm[2];
+        if (key !== lastDate) { day = seenHeader ? day + 1 : 1; seenHeader = true; lastDate = key; }
+        line = dm[3] || '';
+      }
+      line = line.replace(/^[\s・•●○◆◇■□▪▶►\-–—*＊✓✔☐☑]+/, '').replace(/^\d{1,2}[.)、]\s+/, '')
+        .replace(/^\d{1,2}[:：]\d{2}\s*([~～\-–]\s*\d{1,2}[:：]\d{2})?\s*/, '').trim();
+      if (!line || line.length > 60) return;
+      line.split(/\s*(?:→|->|➜|⇒)\s*/).forEach(function (part) {
+        part = part.trim(); if (!part) return;
+        var q = quickParse(part);
+        var money0 = Q_CUR.some(function (c) { return c[0].test(part); }) || /\d\s*(元|塊|円)/.test(part) || /\d[\d,.]*\s*(萬|千|k)?\s*$/i.test(part);
+        if (!money0) { q.amount = 0; q.cur = ''; }
+        var name = q.amount > 0 ? (q.item || part) : part;
+        name = name.replace(/\s+/g, ' ').trim();
+        if (!name) return;
+        out.push({ id: uid('p'), day: day, name: name, cat: planCatOf(name), amt: q.amount > 0 ? q.amount : 0, cur: q.amount > 0 ? (q.cur || T().lastCurrency || 'TWD') : (T().lastCurrency || 'TWD') });
+      });
+    });
+    return out;
+  }
+  function planAmtText(x) { return x.amt > 0 ? '預估 ' + (x.cur === 'TWD' ? money(x.amt) : curName(x.cur) + ' ' + num(x.amt)) : ''; }
+  function planTWD(t, x) { if (!(x.amt > 0)) return 0; if (x.cur === 'TWD') return x.amt; var r = curRate(t, x.cur); return r ? x.amt * r : 0; }
+  function planDays(t) { var mx = t.plan.reduce(function (a, x) { return Math.max(a, x.day); }, 0); return Math.max(mx, planAddOpen); }
+  function renderPlan() {
+    var t = T(), days = planDays(t), h = '';
+    var usedNames = {}; t.expenses.forEach(function (e) { usedNames[e.item] = 1; });
+    for (var d = 1; d <= days; d++) {
+      var items = t.plan.filter(function (x) { return x.day === d; });
+      var date = t.startDate ? addDay(t.startDate, d - 1) : '';
+      h += '<div class="pday"><h3><span>第 ' + d + ' 天' + (date ? '・' + md(date) : '') + '</span><button type="button" class="small secondary" data-pa="add" data-day="' + d + '">＋ 新增</button></h3>';
+      h += items.map(function (x) {
+        return '<div class="pitem"><span class="pic">' + catIcon(x.cat) + '</span><div class="pn"><b>' + esc(x.name) + (usedNames[x.name] ? '<span class="done">已記帳</span>' : '') + '</b><span>' + esc(x.cat) + (x.amt > 0 ? '・' + esc(planAmtText(x)) : '') + '</span></div>' +
+          '<button type="button" class="small danger" data-pa="del" data-id="' + esc(x.id) + '" aria-label="刪除 ' + esc(x.name) + '">刪除</button></div>';
+      }).join('') || '<p class="hint" style="margin:0 0 6px">還沒有行程。</p>';
+      if (planAddOpen === d) {
+        h += '<div class="padd"><label for="paName">名稱</label><input id="paName" type="text" maxlength="60" placeholder="例如：一蘭拉麵">' +
+          '<label>類別</label><div class="chips cats" id="paCats">' + CATEGORIES.map(function (c, i) { return '<button type="button" class="chip" data-pc="' + esc(c) + '" aria-pressed="false">' + ico('c' + i) + '<span>' + (({ 'ETC／高速公路費': 'ETC 過路費', '景點門票': '門票' })[c] || c) + '</span></button>'; }).join('') + '</div>' +
+          '<label for="paAmt">預估金額（選填）</label><div class="row2"><input id="paAmt" type="number" min="0" step="any" inputmode="decimal" placeholder="不知道可以不填"><select id="paCur" aria-label="幣別">' +
+          CURRENCIES.map(function (c) { return '<option value="' + c[0] + '"' + (c[0] === (t.lastCurrency || 'TWD') ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></div>' +
+          '<p class="hint warn" id="paErr" style="margin:6px 0 0"></p><div class="actions"><button type="button" class="small" data-pa="save" data-day="' + d + '">加入</button><button type="button" class="small secondary" data-pa="cancel">取消</button></div></div>';
+      }
+      h += '</div>';
+    }
+    $('planList').innerHTML = h || '<p class="hint" style="margin:0">還沒有行程。可以貼上整段行程，或按「新增一天」一筆一筆加。</p>';
+    var est = 0, byCat = {}, noRate = 0;
+    t.plan.forEach(function (x) { var v = planTWD(t, x); if (x.amt > 0 && !v) noRate++; est += v; if (v) byCat[x.cat] = (byCat[x.cat] || 0) + v; });
+    $('planBudget').hidden = !est; $('planClear').hidden = !t.plan.length;
+    $('planSum').textContent = t.plan.length ? '共 ' + t.plan.length + ' 個行程' + (est ? '，預估花費約 ' + money(est) + '（不含沒寫金額的項目）' : '') + (noRate ? '；有 ' + noRate + ' 項外幣還沒設定匯率，沒算進去。' : '。') : '';
+    if (planAddOpen && $('paName')) $('paName').focus();
+    renderTodayPlan();
+  }
+  function renderTodayPlan() {
+    var t = T(), box = $('todayPlan');
+    if (!t.plan.length || editingId) { box.hidden = true; return; }
+    var d = $('expDate').value, dayN = t.startDate && d ? dayDiff(t.startDate, d) + 1 : 0;
+    var list = t.plan.filter(function (x) { return x.day === dayN; });
+    var label = '今天的行程（點一下自動填好）';
+    if (!list.length) { list = t.plan; label = '我的行程（點一下自動填好）'; }
+    var used = {}; t.expenses.forEach(function (e) { if (e.date === d) used[e.item] = 1; });
+    $('lbTodayPlan').textContent = label;
+    $('todayPlanChips').innerHTML = list.slice(0, 24).map(function (x) {
+      return '<button type="button" class="chip' + (used[x.name] ? ' used' : '') + '" data-plan="' + esc(x.id) + '">' + catIcon(x.cat) + '<span>' + esc(x.name) + '</span></button>';
+    }).join('');
+    box.hidden = false;
+  }
+  function usePlan(id) {
+    var x = T().plan.find(function (p) { return p.id === id; }); if (!x) return;
+    $('expItem').value = x.name; $('expCat').value = x.cat;
+    if (x.amt > 0) {
+      if ($('expCurrency').value !== x.cur) { $('expCurrency').value = x.cur; onCurrencyChange(); }
+      $('expAmount').value = x.amt;
+    }
+    autoRate(); updateCurrencyUI(); updateInstHint(); syncChips();
+    $('quickMsg').className = 'hint';
+    $('quickMsg').textContent = '已帶入「' + x.name + '」' + (x.amt > 0 ? '和預估金額，請改成實際花的金額' : '，請輸入金額') + '，確認後按「新增花費」。';
+    $('expAmount').focus();
+  }
+  function renderPreview() {
+    var box = $('planPreview');
+    if (!pendingPlan.length) { box.innerHTML = ''; return; }
+    var days = {}; pendingPlan.forEach(function (x) { days[x.day] = 1; });
+    box.innerHTML = '<div class="ppre"><p class="hint" style="margin:6px 0">整理出 ' + Object.keys(days).length + ' 天、' + pendingPlan.length + ' 個行程。類別是自動判斷的，不對可以改；不要的可以刪掉。</p>' +
+      pendingPlan.map(function (x, i) {
+        return '<div class="pitem"><span class="pic">' + catIcon(x.cat) + '</span><div class="pn"><input type="text" data-pp="name" data-i="' + i + '" value="' + esc(x.name) + '" aria-label="行程名稱"><span>第 ' + x.day + ' 天' + (x.amt > 0 ? '・' + esc(planAmtText(x)) : '') + '</span></div>' +
+          '<select data-pp="cat" data-i="' + i + '" aria-label="類別">' + CATEGORIES.map(function (c) { return '<option' + (c === x.cat ? ' selected' : '') + '>' + c + '</option>'; }).join('') + '</select>' +
+          '<button type="button" class="small danger" data-pp="del" data-i="' + i + '" aria-label="刪除 ' + esc(x.name) + '">刪除</button></div>';
+      }).join('') +
+      '<div class="actions" style="margin:10px 0 8px"><button type="button" class="small" id="planAccept">加入我的行程</button></div></div>';
+  }
+  $('planParse').addEventListener('click', function () {
+    pendingPlan = parsePlan($('planPaste').value);
+    if (!pendingPlan.length) { $('planPreview').innerHTML = '<p class="hint warn">沒有整理出行程，請確認每一行是一個地點或店名。</p>'; return; }
+    renderPreview();
+  });
+  $('planPasteClear').addEventListener('click', function () { $('planPaste').value = ''; pendingPlan = []; renderPreview(); });
+  $('planPreview').addEventListener('change', function (ev) {
+    var el = ev.target, i = Number(el.dataset.i); if (!pendingPlan[i]) return;
+    if (el.dataset.pp === 'cat') { pendingPlan[i].cat = el.value; renderPreview(); }
+    if (el.dataset.pp === 'name') pendingPlan[i].name = el.value.trim() || pendingPlan[i].name;
+  });
+  $('planPreview').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    if (b.dataset.pp === 'del') { pendingPlan.splice(Number(b.dataset.i), 1); renderPreview(); return; }
+    if (b.id === 'planAccept') {
+      var t = T(); pendingPlan.forEach(function (x) { t.plan.push(x); });
+      var n = pendingPlan.length; pendingPlan = []; $('planPaste').value = ''; $('pasteBox').open = false;
+      save(); renderPreview(); renderPlan(); flash('tripSavedMsg', '✓ 已加入 ' + n + ' 個行程');
+      $('planSum').textContent = '✓ 已加入 ' + n + ' 個行程。' + $('planSum').textContent;
+    }
+  });
+  $('planList').addEventListener('click', function (ev) {
+    var pc = ev.target.closest('button[data-pc]');
+    if (pc) { Array.prototype.forEach.call($('paCats').querySelectorAll('.chip'), function (c) { c.classList.toggle('on', c === pc); c.setAttribute('aria-pressed', String(c === pc)); }); return; }
+    var b = ev.target.closest('button[data-pa]'); if (!b) return;
+    var t = T(), a = b.dataset.pa;
+    if (a === 'add') { planAddOpen = Number(b.dataset.day); renderPlan(); }
+    else if (a === 'cancel') { planAddOpen = 0; renderPlan(); }
+    else if (a === 'del') {
+      var x = t.plan.find(function (p) { return p.id === b.dataset.id; });
+      if (x && confirm('確定要刪除「' + x.name + '」嗎？')) { t.plan = t.plan.filter(function (p) { return p !== x; }); save(); renderPlan(); }
+    } else if (a === 'save') {
+      var name = $('paName').value.trim(), on = $('paCats').querySelector('.chip.on'), amt = toNum($('paAmt').value);
+      if (!name) { $('paErr').textContent = '請輸入名稱。'; $('paName').focus(); return; }
+      t.plan.push({ id: uid('p'), day: Number(b.dataset.day), name: name.slice(0, 60), cat: on ? on.dataset.pc : planCatOf(name), amt: amt, cur: $('paCur').value });
+      planAddOpen = 0; save(); renderPlan();
+    }
+  });
+  $('planAddDay').addEventListener('click', function () { var t = T(); planAddOpen = planDays(t) + 1; renderPlan(); });
+  $('planClear').addEventListener('click', function () { if (confirm('確定要清空這趟旅行的所有行程嗎？已經記的帳不會受影響。')) { T().plan = []; save(); renderPlan(); } });
+  $('planBudget').addEventListener('click', function () {
+    var t = T(), byCat = {};
+    t.plan.forEach(function (x) { var v = planTWD(t, x); if (v) byCat[x.cat] = (byCat[x.cat] || 0) + v; });
+    var lines = Object.keys(byCat).map(function (c) { return c + ' ' + money(byCat[c]); });
+    if (!lines.length) return;
+    if (!confirm('會把下面這些類別的預算，改成行程的預估金額（只是建議，之後還可以改）：\n' + lines.join('\n') + '\n\n沒有寫金額的項目、住宿、機票等不會算進去。確定要套用嗎？')) return;
+    Object.keys(byCat).forEach(function (c) { t.catBudgets[c] = Math.round(byCat[c]); });
+    save(); fillTripForm(); renderAll(); flash('savedMsg', '✓ 已套用到類別預算');
+  });
+  $('todayPlanChips').addEventListener('click', function (ev) { var b = ev.target.closest('button[data-plan]'); if (b) usePlan(b.dataset.plan); });
+  $('expDate').addEventListener('change', renderTodayPlan);
+  renderPlan();
+
 
   $('expDate').addEventListener('change', syncChips);
   $('expCat').addEventListener('change', syncChips);
