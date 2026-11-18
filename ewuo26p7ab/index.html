@@ -558,7 +558,7 @@
   .tm-box .v small { display: block; font-weight: 400; font-size: .8rem; color: var(--muted); }
   .tm-box.wide { grid-column: 1 / -1; }
   /* 記帳：簡易模式 */
-  #expFormCard .grid > div:has(#expAmount) { order: -5; } #expFormCard .grid > div:has(#expItem) { order: -4; }
+  #expFormCard .grid > div:has(#expAmount) { order: -6; } #expFormCard .grid > div:has(#expCurrency) { order: -5; } #expFormCard #rateField { order: -5; } #expFormCard .grid > div:has(#expItem) { order: -4; }
   #expAmount { font-size: 1.35rem; font-weight: 700; min-height: 52px; }
   .advbox { border: 1px dashed var(--milktea); border-radius: 14px; padding: 0 12px; margin-top: 12px; }
   .advbox > summary { list-style: none; cursor: pointer; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; color: var(--caramel); }
@@ -568,6 +568,7 @@
   .advbox[open] > summary { border-bottom: 1px dashed var(--line); margin-bottom: 10px; }
   .qin-fold > summary { cursor: pointer; font-size: .9rem; color: var(--caramel); min-height: 40px; display: flex; align-items: center; }
   .savetoast { margin-top: 12px; border-radius: 14px; padding: 10px 12px; background: var(--sage-light); color: var(--sage-text); border: 1px solid #D3D8C8; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .savetoast[hidden] { display: none; }
   .savetoast b { flex: 1 1 100%; }
   .savetoast button { min-height: 36px; padding: 0 12px; font-size: .88rem; }
   /* 分帳結果 */
@@ -762,10 +763,10 @@
   <!-- 分頁 -->
   <nav class="tabs" id="tabs">
     <button class="tab" data-tab="overview"><svg class="ic" aria-hidden="true"><use href="#i-overview"/></svg>總覽</button>
+    <button class="tab" data-tab="trip"><svg class="ic" aria-hidden="true"><use href="#i-trip"/></svg>旅行</button>
     <button class="tab" data-tab="add"><svg class="ic" aria-hidden="true"><use href="#i-add"/></svg>記帳</button>
     <button class="tab" data-tab="split"><svg class="ic" aria-hidden="true"><use href="#i-split"/></svg>分帳</button>
     <button class="tab" data-tab="fx"><svg class="ic" aria-hidden="true"><use href="#i-fx"/></svg>外幣</button>
-    <button class="tab" data-tab="trip"><svg class="ic" aria-hidden="true"><use href="#i-more"/></svg>更多</button>
   </nav>
 
   <!-- ========== 總覽 ========== -->
@@ -1991,7 +1992,7 @@
     $('expPre').checked = !!(t.startDate && today() < t.startDate);
     $('expProxy').checked = false; $('expProxyFor').value = ''; $('expProxyGot').checked = false; $('proxyBlock').style.display = 'none';
     clearReceipt(); $('receiptBox').style.display = '';
-    $('expCurrency').value = t.lastCurrency;
+    $('expCurrency').value = (!t.expenses.length && t.lastCurrency === 'TWD' && destCur(t)) || t.lastCurrency;
     renderSplitUI(null, null, null);
     onCurrencyChange();
     $('formError').textContent = '';
@@ -3369,6 +3370,14 @@
   // ---- 儀表板 ----
   var tripMode = false;
   try { tripMode = localStorage.getItem('tb_tripMode') === '1'; } catch (e) {}
+  function destCur(t) {
+  var DEST_CUR = [[/日本|東京|大阪|京都|奈良|神戶|北海道|札幌|函館|沖繩|那霸|福岡|九州|名古屋|橫濱|鎌倉|箱根|仙台|廣島|金澤|輕井澤|富士/, 'JPY'], [/韓國|首爾|釜山|濟州|大邱|仁川|慶州/, 'KRW'], [/香港/, 'HKD'], [/澳門/, 'MOP'], [/泰國|曼谷|清邁|普吉|芭達雅|華欣/, 'THB'], [/新加坡/, 'SGD'], [/馬來西亞|吉隆坡|檳城|沙巴|蘭卡威|馬六甲/, 'MYR'], [/越南|河內|胡志明|峴港|富國|芽莊|會安/, 'VND'], [/菲律賓|宿霧|長灘|馬尼拉|薄荷/, 'PHP'], [/印尼|峇里|巴里|雅加達/, 'IDR'], [/中國|上海|北京|廈門|成都|重慶|廣州|深圳|杭州|西安/, 'CNY'], [/英國|倫敦|蘇格蘭|愛丁堡/, 'GBP'], [/瑞士|蘇黎世|日內瓦|少女峰/, 'CHF'], [/法國|巴黎|德國|柏林|慕尼黑|義大利|羅馬|米蘭|威尼斯|佛羅倫斯|西班牙|巴塞隆納|馬德里|荷蘭|阿姆斯特丹|奧地利|維也納|希臘|葡萄牙|里斯本|比利時|芬蘭|愛爾蘭|克羅埃西亞|斯洛維尼亞|歐洲/, 'EUR'], [/美國|紐約|洛杉磯|舊金山|夏威夷|關島|拉斯維加斯|西雅圖/, 'USD'], [/加拿大|溫哥華|多倫多|班夫/, 'CAD'], [/紐西蘭|奧克蘭|皇后鎮/, 'NZD'], [/澳洲|雪梨|墨爾本|布里斯本|黃金海岸|伯斯/, 'AUD']];
+    var keys = Object.keys(t.presetRates || {}).filter(function (c) { return c !== 'TWD'; });
+    if (keys.length === 1) return keys[0];
+    var s2 = (t.destination || '') + ' ' + (t.name || '');
+    for (var i = 0; i < DEST_CUR.length; i++) if (DEST_CUR[i][0].test(s2)) return DEST_CUR[i][1];
+    return '';
+  }
   function fmtD(d) { return d ? d.replace(/-/g, '/') : ''; }
   function dashStats(t) {
     var ex = counted(t), spent = 0, pre = 0, byDate = {}, td = today();
@@ -3394,7 +3403,7 @@
     var t = T(), D = dashStats(t);
     $('dashWhen').textContent = D.days ? (D.phase === 'during' ? '今天是第 ' + D.dayN + ' 天，含今天還有 ' + D.daysLeft + ' 天' : D.phase === 'before' ? '還沒出發，共 ' + D.days + ' 天' : D.phase === 'after' ? '旅程已結束' : '') : '還沒設定旅行日期';
     var lv = 0, st = '';
-    if (!t.totalBudget) { st = '還沒設定總預算。到「更多」設定預算和日期，就能看到每天建議可以花多少。'; }
+    if (!t.totalBudget) { st = '還沒設定總預算。到「旅行」分頁設定預算和日期，就能看到每天建議可以花多少。'; }
     else if (D.pct >= 100) { lv = 3; st = '已超出總預算 ' + money(-D.left) + '，接下來要省一點囉。'; }
     else if (D.pct >= 80) { lv = 2; st = '預算已經用了 ' + Math.floor(D.pct) + '%，要注意剩下的花費。'; }
     else if (D.pct >= 50) { lv = 1; st = '預算已經用了一半以上（' + Math.floor(D.pct) + '%），目前還在掌握中。'; }
@@ -3445,8 +3454,7 @@
     adv.innerHTML = '<summary><span>更多設定</span><span class="advsum" id="advSum"></span></summary><div class="advin"></div>';
     var inner = adv.querySelector('.advin');
     var g2 = document.createElement('div'); g2.className = 'grid'; inner.appendChild(g2);
-    ['expDate', 'expCurrency', 'expPay'].forEach(function (id) { var el = $(id).closest('.grid > div'); if (el) g2.appendChild(el); });
-    g2.appendChild($('rateField'));
+    ['expDate', 'expPay'].forEach(function (id) { var el = $(id).closest('.grid > div'); if (el) g2.appendChild(el); });
     var splitDiv = $('expSplit').closest('#splitBlock > div');
     var after = $('splitBlock');
     after.parentNode.insertBefore(adv, after.nextSibling);
@@ -3454,18 +3462,14 @@
     var note = $('expNote').closest('.field'); if (note) inner.appendChild(note);
     inner.appendChild($('moreFields')); inner.appendChild($('receiptBox'));
     // 快速輸入收成一個小按鈕
-    var qin = card.querySelector('.qin');
-    var qf = document.createElement('details'); qf.className = 'qin-fold'; qf.innerHTML = '<summary>✨ 用一句話記帳（可以用鍵盤上的 🎤 說）</summary>';
-    qin.parentNode.insertBefore(qf, qin); qf.appendChild(qin);
     var keep = false; try { keep = localStorage.getItem('tb_adv') === '1'; } catch (e) {}
-    adv.open = keep; if (window.__openAll) { adv.open = true; qf.open = true; }
+    adv.open = keep; if (window.__openAll) adv.open = true;
     adv.addEventListener('toggle', function () { try { localStorage.setItem('tb_adv', adv.open ? '1' : '0'); } catch (e) {} });
   })();
   function advSummary() {
     if (!$('advSum')) return;
-    var t = T(), d = $('expDate').value, cur = $('expCurrency').value, pay = $('expPay').value, parts = [];
+    var t = T(), d = $('expDate').value, pay = $('expPay').value, parts = [];
     parts.push(d === today() ? '今天' : md(d));
-    parts.push(curName(cur));
     if (pay) parts.push(pay);
     if (t.members.length) { var sp = currentSplit(); parts.push(sp.length === t.members.length ? (sp.length + ' 人平分') : sp.length ? sp.join('、') + ' 分攤' : '還沒選分攤的人'); }
     $('advSum').textContent = parts.join('・');
