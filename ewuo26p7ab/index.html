@@ -551,6 +551,13 @@
   @media (max-width: 560px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 380px) { .dash-big { font-size: 1.7rem; } .quickadd { padding: 0 14px; } }
   body.tripmode #tab-overview .tm-hide { display: none !important; }
+  .dash-today { margin-top: 12px; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; background: var(--soft); }
+  .dash-today > h2, .dash-today .today-s { display: none; }
+  .dash-today .today-v { font-size: 1.5rem; font-weight: 800; margin: 0; }
+  .dash-today .hint { margin: 2px 0 0; }
+  #tab-overview .intro .sub, #tab-overview .intro .concept { display: none; }
+  .morerow td { text-align: center !important; }
+  .payhint { margin: 4px 0 0; }
   .tm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
   .tm-box { border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: var(--soft); }
   .tm-box .k { font-size: .78rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
@@ -558,7 +565,7 @@
   .tm-box .v small { display: block; font-weight: 400; font-size: .8rem; color: var(--muted); }
   .tm-box.wide { grid-column: 1 / -1; }
   /* 記帳：簡易模式 */
-  #expFormCard .grid > div:has(#expAmount) { order: -6; } #expFormCard .grid > div:has(#expCurrency) { order: -5; } #expFormCard #rateField { order: -5; } #expFormCard .grid > div:has(#expItem) { order: -4; }
+  #expFormCard .grid > div:has(#expAmount) { order: -6; } #expFormCard .grid > div:has(#expCurrency) { order: -5; } #expFormCard .grid > div:has(#expPay) { order: -5; } #expFormCard #rateField { order: -5; } #expFormCard .grid > div:has(#expItem) { order: -4; }
   #expAmount { font-size: 1.35rem; font-weight: 700; min-height: 52px; }
   .advbox { border: 1px dashed var(--milktea); border-radius: 14px; padding: 0 12px; margin-top: 12px; }
   .advbox > summary { list-style: none; cursor: pointer; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; color: var(--caramel); }
@@ -1532,6 +1539,7 @@
     t.poolAlert = toNum(d.poolAlert);
     t.displayCur = (validCur(d.displayCur) && d.displayCur !== 'TWD') ? d.displayCur : '';
     if (d.createdAt) t.createdAt = d.createdAt;
+    if (t.members.length > (t.travelers || 0)) t.travelers = t.members.length;
     return t;
   }
   function ensureTrip() {
@@ -1909,6 +1917,7 @@
     if (typeof syncChips === 'function') syncChips();
   }
   function onCurrencyChange() {
+    if (typeof placePay === 'function') placePay();
     autoRate();
     updateCurrencyUI();
     renderQuickAmts();
@@ -2249,12 +2258,15 @@
       return ka < kb ? 1 : -1;
     });
   }
+  var listShow = 30;
   function renderList() {
-    var t = T(), list = filtered(t);
+    var t = T(), list = filtered(t), total = list.length;
+    if (!batchMode) list = list.slice(0, listShow);
     renderBatchBar();
     var active = Object.keys(filters).some(function (k) { return filters[k] !== ''; });
     var sum = list.reduce(function (s, e) { return s + (Number(e.amount) || 0); }, 0);
-    $('filterSum').textContent = (active ? '篩選結果：' : '共 ') + list.length + ' 筆，合計 ' + money(sum);
+    if (total > list.length) sum = filtered(t).reduce(function (s, e) { return s + (Number(e.amount) || 0); }, 0);
+    $('filterSum').textContent = (active ? '篩選結果：' : '共 ') + total + ' 筆，合計 ' + money(sum);
     if (!list.length) {
       $('expList').innerHTML = '<tr><td colspan="5" class="empty">' +
         (t.expenses.length ? '沒有符合篩選條件的紀錄。' : '目前還沒有花費紀錄，請在上方新增一筆。') + '</td></tr>';
@@ -2280,7 +2292,7 @@
             '<button class="small secondary" data-act="copy" data-id="' + esc(e.id) + '">複製</button> ' +
             '<button class="small danger" data-act="del" data-id="' + esc(e.id) + '">刪除</button>') +
         '</td></tr>';
-    }).join('');
+    }).join('') + (total > list.length ? '<tr class="morerow"><td colspan="5"><button type="button" class="small secondary" data-act="more">顯示更多（還有 ' + (total - list.length) + ' 筆）</button></td></tr>' : '');
   }
   function csvCell(v) {
     v = v == null ? '' : String(v);
@@ -2592,6 +2604,7 @@
     t.presetRates = {};
     Object.keys(draftRates).forEach(function (c) { if (draftRates[c] > 0) t.presetRates[c] = draftRates[c]; });
     t.members = parseMembers($('members').value);
+    if (t.members.length > (t.travelers || 0)) t.travelers = t.members.length;
     t.note = $('tNote').value.trim();
     save();
     fillTripForm();
@@ -2658,6 +2671,7 @@
     download('旅遊預算_全部旅行備份_' + today() + '.json', JSON.stringify(payload, null, 2), 'application/json');
     db.bk = db.bk || {}; db.bk.count = allExpCount(); db.bk.at = Date.now(); db.bk.ended = db.bk.ended || {};
     db.trips.forEach(function (t) { if (t.endDate && today() > t.endDate) db.bk.ended[t.id] = 1; });
+    try { localStorage.removeItem(KEY2 + '_beforeImport'); } catch (e9) {}
     save(); renderNotes(); if (typeof renderBackupInfo === 'function') renderBackupInfo();
     flash('backupMsg', '✓ 已匯出備份檔');
   }
@@ -2678,7 +2692,7 @@
         try { incoming = d.trips.map(normTrip); } catch (e2) { alert('備份檔的內容有問題，沒有匯入，目前的資料保持不變。'); return; }
         var inE = incoming.reduce(function (a, x) { return a + x.expenses.length; }, 0), curE = db.trips.reduce(function (a, x) { return a + x.expenses.length; }, 0);
         var stamp = obj && obj.exportedAt ? '（備份時間：' + String(obj.exportedAt).slice(0, 16).replace('T', ' ') + '）' : '';
-        if (!confirm('備份檔有 ' + incoming.length + ' 趟旅行、' + inE + ' 筆花費' + stamp + '。\n目前這台裝置有 ' + db.trips.length + ' 趟旅行、' + curE + ' 筆花費。\n\n匯入後，目前的資料會被備份檔取代。匯入前的資料會先暫存一份，匯入後可以按「復原匯入前的資料」還原。確定要匯入嗎？')) return;
+        if (!confirm('備份檔有 ' + incoming.length + ' 趟旅行、' + inE + ' 筆花費' + stamp + '。\n目前這台裝置有 ' + db.trips.length + ' 趟旅行、' + curE + ' 筆花費。\n\n匯入後，目前的資料會被備份檔取代。匯入前的資料會先暫存一份，匯入後可以按「復原匯入前的資料」還原（保留 7 天，或下次匯出備份時清除）。確定要匯入嗎？')) return;
         try { localStorage.setItem(KEY2 + '_beforeImport', JSON.stringify({ at: Date.now(), data: db })); } catch (e3) {}
         db.trips = incoming;
         db.currentId = d.currentId;
@@ -3500,6 +3514,15 @@
   $('dashAdd').addEventListener('click', goAdd);
   Array.prototype.forEach.call(document.querySelectorAll('.tab[data-tab="add"]'), function (b) { b.addEventListener('click', function () { if (!editingId) setTimeout(function () { try { $('expAmount').focus(); } catch (e) {} }, 60); }); });
 
+  // ---- 外幣記帳時，付款方式放在幣別下面（現金才會扣外幣現金） ----
+  var payDiv = null, payHome = null;
+  function placePay() {
+    if (!payDiv) return;
+    var foreign = $('expCurrency').value && $('expCurrency').value !== 'TWD', curDiv = $('expCurrency').closest('.grid > div');
+    if (foreign && curDiv && payDiv.parentNode !== curDiv.parentNode) curDiv.parentNode.insertBefore(payDiv, curDiv.nextSibling);
+    else if (!foreign && payDiv.parentNode !== payHome) payHome.appendChild(payDiv);
+    var h = $('payHint'); if (h) h.hidden = !foreign;
+  }
   // ---- 記帳：簡易模式（把進階欄位收進「更多設定」） ----
   (function () {
     var card = $('expFormCard'), grid = card.querySelector('.grid');
@@ -3511,6 +3534,9 @@
     var splitDiv = $('expSplit').closest('#splitBlock > div');
     var after = $('splitBlock');
     after.parentNode.insertBefore(adv, after.nextSibling);
+    payDiv = $('expPay').closest('.grid > div'); payHome = g2;
+    var ph = document.createElement('p'); ph.className = 'hint payhint'; ph.id = 'payHint'; ph.textContent = '選「現金」，才會從手上的外幣現金扣掉。'; payDiv.appendChild(ph);
+    placePay();
     if (splitDiv) { var sb = document.createElement('div'); sb.id = 'splitAdv'; sb.appendChild(splitDiv); inner.appendChild(sb); }
     var note = $('expNote').closest('.field'); if (note) inner.appendChild(note);
     inner.appendChild($('moreFields')); inner.appendChild($('receiptBox'));
@@ -3638,6 +3664,13 @@
   $('rptJson').addEventListener('click', exportBackup);
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !$('reportView').hidden) $('reportView').hidden = true; });
 
+  (function () {
+    var tc = $('todayCard'), dash = $('dashCard'); if (!tc || !dash) return;
+    tc.classList.remove('card'); tc.classList.add('dash-today');
+    var lb = document.createElement('div'); lb.className = 'dl'; lb.textContent = '今天還可以花'; tc.insertBefore(lb, $('todayV'));
+    dash.insertBefore(tc, $('dashKpis'));
+  })();
+  try { var sn0 = JSON.parse(localStorage.getItem(KEY2 + '_beforeImport') || 'null'); if (sn0 && Date.now() - sn0.at > 7 * 86400000) localStorage.removeItem(KEY2 + '_beforeImport'); } catch (e) {}
   function renderV2() { renderDash(); renderWho(); renderBackupInfo(); advSummary(); }
   renderV2();
 
@@ -3725,6 +3758,7 @@
       case 'edit': startEdit(id); break;
       case 'copy': startCopy(id); break;
       case 'del': deleteExp(id); break;
+      case 'more': listShow += 30; renderList(); break;
       case 'settle':
         if (!confirm('確認 ' + btn.dataset.from + ' 已經轉帳 ' + money(btn.dataset.amt) + ' 給 ' + btn.dataset.to + '？')) return;
         t.settlements.push({ id: uid('s'), date: today(), from: btn.dataset.from, to: btn.dataset.to, amount: Number(btn.dataset.amt), createdAt: Date.now() });
